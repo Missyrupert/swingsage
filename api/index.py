@@ -3,9 +3,6 @@ Vercel Serverless Function Entry Point for Swing Sage
 Adapted for serverless deployment
 """
 
-from utils import cleanup_old_files, allowed_file, handle_video_orientation
-from coaching_engine import CoachingEngine
-from video_processor import SwingAnalyzer
 import uuid
 import time
 import threading
@@ -20,7 +17,31 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 
 
-# Import our modular components
+# Import our modular components with graceful fallbacks
+try:
+    from video_processor import SwingAnalyzer
+    from coaching_engine import CoachingEngine
+    from utils import cleanup_old_files, allowed_file, handle_video_orientation
+    MEDIAPIPE_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Some dependencies not available: {e}")
+    MEDIAPIPE_AVAILABLE = False
+    # Create dummy classes for serverless environment
+
+    class SwingAnalyzer:
+        def analyze_swing(self, input_path, output_path):
+            return {
+                'total_frames': 0,
+                'collapse_frames': 0,
+                'collapse_percentage': 0.0,
+                'posture_loss_frames': 0,
+                'posture_loss_percentage': 0.0,
+                'error': 'MediaPipe not available in serverless environment'
+            }
+
+    class CoachingEngine:
+        def generate_feedback(self, analysis_result, golfer_type="weekend_player", experience="intermediate"):
+            return "Video analysis requires MediaPipe which is not available in serverless environment. Please use local deployment for full functionality."
 
 app = Flask(__name__)
 app.secret_key = 'swing-sage-secret-change-in-production'
@@ -135,7 +156,11 @@ def serve_video(filename):
 
 @app.route('/health')
 def health():
-    return jsonify({'status': 'healthy', 'timestamp': datetime.now().isoformat()})
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.now().isoformat(),
+        'mediapipe_available': MEDIAPIPE_AVAILABLE
+    })
 
 # Vercel serverless handler - this is the main entry point for Vercel
 
