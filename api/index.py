@@ -3,19 +3,18 @@ Vercel Serverless Function Entry Point for Swing Sage
 Adapted for serverless deployment
 """
 
-import uuid
-import time
-import threading
-from datetime import datetime
-from werkzeug.utils import secure_filename
-from flask import Flask, request, jsonify, render_template, redirect, url_for, session, send_from_directory
 import os
 import sys
 from pathlib import Path
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session, send_from_directory
+from werkzeug.utils import secure_filename
+from datetime import datetime
+import threading
+import time
+import uuid
 
 # Add the parent directory to the Python path
 sys.path.append(str(Path(__file__).parent.parent))
-
 
 # Import our modular components with graceful fallbacks
 try:
@@ -43,6 +42,7 @@ except ImportError as e:
         def generate_feedback(self, analysis_result, golfer_type="weekend_player", experience="intermediate"):
             return "Video analysis requires MediaPipe which is not available in serverless environment. Please use local deployment for full functionality."
 
+# Create Flask app
 app = Flask(__name__)
 app.secret_key = 'swing-sage-secret-change-in-production'
 
@@ -52,30 +52,47 @@ app.config['PROCESSED_FOLDER'] = '/tmp/processed_videos'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
 
 # Ensure directories exist
-Path(app.config['UPLOAD_FOLDER']).mkdir(exist_ok=True)
-Path(app.config['PROCESSED_FOLDER']).mkdir(exist_ok=True)
+try:
+    Path(app.config['UPLOAD_FOLDER']).mkdir(exist_ok=True)
+    Path(app.config['PROCESSED_FOLDER']).mkdir(exist_ok=True)
+except Exception as e:
+    print(f"Warning: Could not create directories: {e}")
 
 # Initialize components
-swing_analyzer = SwingAnalyzer()
-coaching_engine = CoachingEngine()
+try:
+    swing_analyzer = SwingAnalyzer()
+    coaching_engine = CoachingEngine()
+except Exception as e:
+    print(f"Warning: Could not initialize components: {e}")
+    swing_analyzer = None
+    coaching_engine = None
 
 
 @app.route('/')
 def index():
-    return render_template('landing.html')
+    try:
+        return render_template('landing.html')
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/calibrate')
 def calibrate():
-    session['session_id'] = str(uuid.uuid4())
-    return render_template('calibrate.html')
+    try:
+        session['session_id'] = str(uuid.uuid4())
+        return render_template('calibrate.html')
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/upload')
 def upload():
-    if 'session_id' not in session:
-        return redirect(url_for('calibrate'))
-    return render_template('upload.html')
+    try:
+        if 'session_id' not in session:
+            return redirect(url_for('calibrate'))
+        return render_template('upload.html')
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/analyze', methods=['POST'])
@@ -144,29 +161,56 @@ def analyze():
 
 @app.route('/results')
 def results():
-    if 'last_analysis' not in session:
-        return redirect(url_for('index'))
-    return render_template('results.html', analysis=session['last_analysis'])
+    try:
+        if 'last_analysis' not in session:
+            return redirect(url_for('index'))
+        return render_template('results.html', analysis=session['last_analysis'])
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/videos/<filename>')
 def serve_video(filename):
-    return send_from_directory(app.config['PROCESSED_FOLDER'], filename)
+    try:
+        return send_from_directory(app.config['PROCESSED_FOLDER'], filename)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/test')
+def test():
+    try:
+        return jsonify({
+            'message': 'Swing Sage is working!',
+            'status': 'success',
+            'timestamp': datetime.now().isoformat()
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/health')
 def health():
-    return jsonify({
-        'status': 'healthy',
-        'timestamp': datetime.now().isoformat(),
-        'mediapipe_available': MEDIAPIPE_AVAILABLE
-    })
+    try:
+        return jsonify({
+            'status': 'healthy',
+            'timestamp': datetime.now().isoformat(),
+            'mediapipe_available': MEDIAPIPE_AVAILABLE
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # Vercel serverless handler - this is the main entry point for Vercel
 
 
 def handler(request, context):
-    return app(request, context)
+    try:
+        return app(request, context)
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': f'Internal server error: {str(e)}'
+        }
 
 
 # For local development
