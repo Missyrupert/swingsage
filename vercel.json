@@ -4,12 +4,6 @@
   "outputDirectory": null,
   "installCommand": null,
   "framework": null,
-  "builds": [
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python"
-    }
-  ],
   "routes": [
     {
       "src": "/(.*)",
