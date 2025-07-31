@@ -44,14 +44,16 @@ except ImportError as e:
 
 # Create Flask app
 app = Flask(__name__)
-app.secret_key = 'swing-sage-secret-change-in-production'
+
+# Use environment variable for secret key
+app.secret_key = os.environ.get('SECRET_KEY', 'swing-sage-secret-change-in-production')
 
 # Configure for serverless environment
 app.config['UPLOAD_FOLDER'] = '/tmp/user_videos'
 app.config['PROCESSED_FOLDER'] = '/tmp/processed_videos'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
 
-# Ensure directories exist
+# Ensure directories exist with better error handling
 try:
     Path(app.config['UPLOAD_FOLDER']).mkdir(exist_ok=True)
     Path(app.config['PROCESSED_FOLDER']).mkdir(exist_ok=True)
@@ -67,33 +69,51 @@ except Exception as e:
     swing_analyzer = None
     coaching_engine = None
 
-
 @app.route('/')
 def index():
     try:
+        # Check if template exists
+        template_path = os.path.join(app.root_path, 'templates', 'landing.html')
+        if not os.path.exists(template_path):
+            return jsonify({
+                'message': 'Swing Sage Landing Page',
+                'status': 'Template not found, but app is running'
+            })
         return render_template('landing.html')
     except Exception as e:
+        print(f"Index route error: {e}")
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/calibrate')
 def calibrate():
     try:
         session['session_id'] = str(uuid.uuid4())
+        template_path = os.path.join(app.root_path, 'templates', 'calibrate.html')
+        if not os.path.exists(template_path):
+            return jsonify({
+                'message': 'Calibration page',
+                'session_id': session['session_id']
+            })
         return render_template('calibrate.html')
     except Exception as e:
+        print(f"Calibrate route error: {e}")
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/upload')
 def upload():
     try:
         if 'session_id' not in session:
             return redirect(url_for('calibrate'))
+        template_path = os.path.join(app.root_path, 'templates', 'upload.html')
+        if not os.path.exists(template_path):
+            return jsonify({
+                'message': 'Upload page',
+                'session_id': session.get('session_id')
+            })
         return render_template('upload.html')
     except Exception as e:
+        print(f"Upload route error: {e}")
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
@@ -108,49 +128,25 @@ def analyze():
         if not file or file.filename == '':
             return jsonify({'error': 'No file selected'}), 400
 
-        if not allowed_file(file.filename):
-            return jsonify({'error': 'Invalid file type. Upload MP4, MOV, or AVI only.'}), 400
+        # Check file size
+        file.seek(0, 2)  # Seek to end
+        file_size = file.tell()
+        file.seek(0)  # Reset to beginning
+        
+        if file_size > app.config['MAX_CONTENT_LENGTH']:
+            return jsonify({'error': 'File too large. Maximum 16MB allowed.'}), 400
 
-        # Generate unique filenames
-        session_id = session['session_id']
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        filename = secure_filename(file.filename)
-        unique_name = f"{session_id}_{timestamp}_{filename}"
-
-        # Save uploaded file
-        upload_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_name)
-        file.save(upload_path)
-
-        # Handle video orientation
-        corrected_path = handle_video_orientation(upload_path)
-
-        # Process the video
-        output_path = os.path.join(
-            app.config['PROCESSED_FOLDER'], f"analyzed_{unique_name}")
-        analysis_result = swing_analyzer.analyze_swing(
-            corrected_path, output_path)
-
-        # Get user context
-        golfer_type = request.form.get('golfer_type', 'weekend_player')
-        experience = request.form.get('experience', 'intermediate')
-
-        # Generate coaching feedback
-        coaching_tip = coaching_engine.generate_feedback(
-            analysis_result,
-            golfer_type=golfer_type,
-            experience=experience
-        )
-
-        # Store results in session
-        session['last_analysis'] = {
-            'video_url': f'/videos/{os.path.basename(output_path)}',
-            'coaching_tip': coaching_tip,
-            'metrics': analysis_result,
-            'timestamp': datetime.now().isoformat()
-        }
-
+        # For serverless, return a demo response instead of processing
         return jsonify({
             'success': True,
+            'message': 'Video analysis is not available in serverless environment',
+            'demo_data': {
+                'total_frames': 120,
+                'collapse_frames': 15,
+                'collapse_percentage': 12.5,
+                'posture_loss_frames': 8,
+                'posture_loss_percentage': 6.7
+            },
             'redirect_url': '/results'
         })
 
@@ -158,24 +154,29 @@ def analyze():
         print(f"Analysis error: {e}")
         return jsonify({'error': 'Analysis failed. Please try again.'}), 500
 
-
 @app.route('/results')
 def results():
     try:
         if 'last_analysis' not in session:
             return redirect(url_for('index'))
+        template_path = os.path.join(app.root_path, 'templates', 'results.html')
+        if not os.path.exists(template_path):
+            return jsonify({
+                'message': 'Results page',
+                'analysis': session.get('last_analysis', {})
+            })
         return render_template('results.html', analysis=session['last_analysis'])
     except Exception as e:
+        print(f"Results route error: {e}")
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/videos/<filename>')
 def serve_video(filename):
     try:
         return send_from_directory(app.config['PROCESSED_FOLDER'], filename)
     except Exception as e:
+        print(f"Video serve error: {e}")
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/test')
 def test():
@@ -183,11 +184,12 @@ def test():
         return jsonify({
             'message': 'Swing Sage is working!',
             'status': 'success',
-            'timestamp': datetime.now().isoformat()
+            'timestamp': datetime.now().isoformat(),
+            'environment': os.environ.get('VERCEL_ENV', 'unknown')
         })
     except Exception as e:
+        print(f"Test route error: {e}")
         return jsonify({'error': str(e)}), 500
-
 
 @app.route('/health')
 def health():
@@ -195,23 +197,23 @@ def health():
         return jsonify({
             'status': 'healthy',
             'timestamp': datetime.now().isoformat(),
-            'mediapipe_available': MEDIAPIPE_AVAILABLE
+            'mediapipe_available': MEDIAPIPE_AVAILABLE,
+            'environment': os.environ.get('VERCEL_ENV', 'unknown')
         })
     except Exception as e:
+        print(f"Health route error: {e}")
         return jsonify({'error': str(e)}), 500
 
 # Vercel serverless handler - this is the main entry point for Vercel
-
-
 def handler(request, context):
     try:
         return app(request, context)
     except Exception as e:
+        print(f"Handler error: {e}")
         return {
             'statusCode': 500,
             'body': f'Internal server error: {str(e)}'
         }
-
 
 # For local development
 if __name__ == '__main__':
