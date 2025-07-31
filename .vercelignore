@@ -1,0 +1,66 @@
+# Exclude development files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+swing_sage_env/
+.env
+.env.local
+
+# Exclude video files
+user_videos/
+processed_videos/
+annotated_videos/
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.wmv
+*.flv
+*.webm
+
+# Exclude database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Exclude logs
+*.log
+logs/
+
+# Exclude temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Exclude IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Exclude OS files
+.DS_Store
+Thumbs.db
+
+# Exclude any Next.js or React files that might exist
+node_modules/
+package.json
+package-lock.json
+next.config.js
+.next/
+src/
+public/
+
+# Keep only essential files for deployment
+!api/
+!templates/
+!static/
+!*.py
+!requirements.txt
+!vercel.json
+!README.md 

@@ -1,0 +1,14 @@
+# Swing Sage Email Configuration
+# Copy this file to .env and fill in your actual values
+
+# Gmail Account Settings
+SWING_SAGE_EMAIL=your-email@gmail.com
+SWING_SAGE_EMAIL_PASSWORD=your-16-character-app-password
+
+# Optional: Custom SMTP Settings (if not using Gmail)
+# SWING_SAGE_SMTP_SERVER=smtp.gmail.com
+# SWING_SAGE_SMTP_PORT=587
+
+# Development Settings
+FLASK_ENV=development
+FLASK_DEBUG=True 

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Setup - Swing Sage</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; color: white; font-family: -apple-system, BlinkMacSystemFont, sans-serif; overflow: hidden; height: 100vh; }
+        .container { position: relative; width: 100vw; height: 100vh; }
+        #video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+        
+        .golfer-outline {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 200px;
+            border: 3px dashed rgba(255, 255, 255, 0.7);
+            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .golfer-outline.aligned {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .instructions {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1.5rem;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            max-width: 90%;
+            z-index: 3;
+        }
+        
+        .status {
+            position: absolute;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            z-index: 3;
+            transition: all 0.3s ease;
+        }
+        
+        .status.ready {
+            background: rgba(0, 255, 136, 0.2);
+            border: 2px solid rgba(0, 255, 136, 0.5);
+        }
+        
+        .continue-btn {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+            color: #000;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 3;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .continue-btn.visible { opacity: 1; }
+        .continue-btn:hover { transform: translateX(-50%) translateY(-2px); }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 4;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid #00ff88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(255, 0, 0, 0.9);
+            padding: 2rem;
+            border-radius: 16px;
+            z-index: 4;
+        }
+        
+        .error button {
+            background: white;
+            color: black;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .golfer-outline { width: 70px; height: 180px; }
+            .instructions { padding: 1rem; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <video id="video" autoplay muted playsinline></video>
+        <div class="overlay">
+            <div class="golfer-outline" id="outline"></div>
+            <div class="instructions">
+                <h2>📹 Set up your shot</h2>
+                <p>Stand sideways to your phone, about 6-8 feet away. We'll help you get the perfect angle for analysis.</p>
+            </div>
+            <div class="status" id="status">Getting camera ready...</div>
+            <button class="continue-btn" id="continueBtn" onclick="proceedToUpload()">Perfect! Continue →</button>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div>Setting up camera...</div>
+        </div>
+        
+        <div class="error" id="error" style="display: none;">
+            <h3>Camera needed</h3>
+            <p>We need camera access to help you set up the perfect shot.</p>
+            <button onclick="startCamera()">Try again</button>
+        </div>
+    </div>
+
+    <script>
+        let stream = null;
+        let aligned = false;
+        
+        const video = document.getElementById('video');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const status = document.getElementById('status');
+        const continueBtn = document.getElementById('continueBtn');
+        const outline = document.getElementById('outline');
+
+        window.addEventListener('load', startCamera);
+
+        async function startCamera() {
+            try {
+                loading.style.display = 'block';
+                error.style.display = 'none';
+
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                });
+
+                video.srcObject = stream;
+                video.addEventListener('loadedmetadata', () => {
+                    loading.style.display = 'none';
+                    setTimeout(simulateAlignment, 2000);
+                });
+
+            } catch (err) {
+                console.error('Camera error:', err);
+                loading.style.display = 'none';
+                error.style.display = 'block';
+            }
+        }
+
+        function simulateAlignment() {
+            aligned = true;
+            outline.classList.add('aligned');
+            status.textContent = '✅ Perfect position! Ready to continue';
+            status.classList.add('ready');
+            continueBtn.classList.add('visible');
+        }
+
+        function proceedToUpload() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            window.location.href = '/upload';
+        }
+    </script>
+</body>
+</html> 

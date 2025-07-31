@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test NUKE 76-80 Features</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #0d1117;
+      color: #f0f6fc;
+    }
+    
+    .test-section {
+      background: #161b22;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid #30363d;
+    }
+    
+    .test-button {
+      background: #00c896;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    
+    .test-button:hover {
+      background: #00a884;
+    }
+    
+    .result {
+      margin-top: 15px;
+      padding: 15px;
+      background: #21262d;
+      border-radius: 8px;
+      border-left: 4px solid #00c896;
+    }
+    
+    /* Import the styles from the main file */
+    /* Golf Language Only */
+    .golf-language-only {
+      background: #161b22;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.06);
+    }
+    
+    .golf-feedback-item {
+      background: #21262d;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      border-left: 4px solid #58a6ff;
+    }
+    
+    .golf-context {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 0.875rem;
+      color: #8b949e;
+    }
+    
+    .golf-icon {
+      font-size: 1.125rem;
+    }
+    
+    /* Progressive Disclosure */
+    .progressive-disclosure {
+      background: #161b22;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.06);
+    }
+    
+    .disclosure-item {
+      background: #21262d;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      border-left: 4px solid #58a6ff;
+    }
+    
+    .disclosure-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #58a6ff;
+      margin-right: 10px;
+    }
+    
+    .status-dot.green {
+      background: #00c896;
+    }
+    
+    .status-dot.yellow {
+      background: #d29922;
+    }
+    
+    .status-dot.red {
+      background: #f85149;
+    }
+    
+    .topic-name {
+      font-weight: 600;
+      color: #f0f6fc;
+    }
+    
+    .disclosure-summary {
+      color: #58a6ff;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    
+    .disclosure-content {
+      color: #c9d1d9;
+      margin-top: 10px;
+      padding: 10px;
+      background: #0d1117;
+      border-radius: 6px;
+    }
+    
+    /* Golf Pal Voice */
+    .golf-pal-voice {
+      background: #161b22;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.06);
+    }
+    
+    .golf-pal-message {
+      background: #21262d;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      border-left: 4px solid #58a6ff;
+    }
+    
+    /* User Defined Focus */
+    .user-defined-focus {
+      background: #161b22;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.06);
+    }
+    
+    .focus-options {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
+    
+    .focus-option {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex: 1;
+      min-width: 150px;
+      text-align: center;
+    }
+    
+    .focus-option:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+      border-color: #58a6ff;
+    }
+    
+    .focus-icon {
+      font-size: 1.5rem;
+      display: block;
+      margin-bottom: 8px;
+    }
+    
+    .focus-content h5 {
+      margin: 0 0 5px 0;
+      color: #f0f6fc;
+    }
+    
+    .focus-content p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: #c9d1d9;
+    }
+    
+    .mode-feedback {
+      margin-top: 20px;
+      padding: 15px;
+      background: #21262d;
+      border-radius: 8px;
+      border-left: 4px solid #00c896;
+    }
+    
+    /* Language Mapping */
+    .language-mapping {
+      background: #161b22;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.06);
+    }
+    
+    .personalized-message {
+      background: #21262d;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      border-left: 4px solid #58a6ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test NUKE 76-80 Features</h1>
+  
+  <div class="test-section">
+    <h2>NUKE 76: Golf Language Only</h2>
+    <button class="test-button" onclick="testGolfLanguage()">Test Golf Language</button>
+    <div id="golfLanguageResult" class="result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>NUKE 77: Progressive Disclosure</h2>
+    <button class="test-button" onclick="testProgressiveDisclosure()">Test Progressive Disclosure</button>
+    <div id="progressiveDisclosureResult" class="result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>NUKE 78: Golf Pal Voice</h2>
+    <button class="test-button" onclick="testGolfPalVoice()">Test Golf Pal Voice</button>
+    <div id="golfPalVoiceResult" class="result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>NUKE 79: User-Defined Focus</h2>
+    <button class="test-button" onclick="testUserDefinedFocus()">Test User-Defined Focus</button>
+    <div id="userDefinedFocusResult" class="result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>NUKE 80: Language Mapping</h2>
+    <button class="test-button" onclick="testLanguageMapping()">Test Language Mapping</button>
+    <div id="languageMappingResult" class="result"></div>
+  </div>
+  
+  <script>
+    // Mock metrics for testing
+    const mockMetrics = {
+      spine_drift: {
+        max_drift: 15
+      },
+      elbow_extension: {
+        max_extension: 145
+      },
+      tempo: {
+        ratio: 3.5
+      }
+    };
+    
+    // Mock localStorage for testing
+    const mockLocalStorage = {
+      userSkillLevel: 'beginner',
+      feedbackMode: 'coach'
+    };
+    
+    // NUKE 76: Ditch Frame Counts — Use Golf Language Only
+    function generateGolfLanguageOnly(metrics) {
+      let html = '<div class="golf-language-only"><h4>🏌️ Golf-Smart Feedback</h4>';
+      
+      if (metrics.spine_drift && metrics.spine_drift.max_drift > 12) {
+        html += `
+          <div class="golf-feedback-item">
+            <p>We noticed your posture drifted a little during the downswing — this can lead to topped shots or loss of compression.</p>
+            <div class="golf-context">
+              <span class="golf-icon">🎯</span>
+              <span class="golf-text">This is a common issue that affects ball-striking consistency</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      if (metrics.elbow_extension && metrics.elbow_extension.max_extension < 150) {
+        html += `
+          <div class="golf-feedback-item">
+            <p>Your trail arm could extend a bit more at the top — this helps create the width that generates power.</p>
+            <div class="golf-context">
+              <span class="golf-icon">💪</span>
+              <span class="golf-text">More extension = more swing width = more potential distance</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      if (metrics.tempo && metrics.tempo.ratio > 3.0) {
+        html += `
+          <div class="golf-feedback-item">
+            <p>Your downswing felt a bit rushed — this can cause timing issues and inconsistent contact.</p>
+            <div class="golf-context">
+              <span class="golf-icon">⏱️</span>
+              <span class="golf-text">Better tempo leads to more consistent ball-striking</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      html += '</div>';
+      return html;
+    }
+    
+    // NUKE 77: Progressive Disclosure System (Curiosity-Driven UI)
+    function generateProgressiveDisclosure(metrics) {
+      let html = '<div class="progressive-disclosure"><h4>ℹ️ Learn More About Your Swing</h4>';
+      
+      const topics = [];
+      
+      if (metrics.spine_drift) {
+        const drift = metrics.spine_drift.max_drift;
+        let status, color;
+        
+        if (drift <= 5) {
+          status = "On Track";
+          color = "green";
+        } else if (drift <= 12) {
+          status = "Needs Attention";
+          color = "yellow";
+        } else {
+          status = "Needs Work";
+          color = "red";
+        }
+        
+        topics.push({
+          name: "Posture",
+          status: status,
+          color: color,
+          explanation: "Maintaining spine angle helps create clean contact and consistent compression. If you stand up too early, it often leads to topped shots or fades."
+        });
+      }
+      
+      if (metrics.elbow_extension) {
+        const extension = metrics.elbow_extension.max_extension;
+        let status, color;
+        
+        if (extension >= 160) {
+          status = "On Track";
+          color = "green";
+        } else if (extension >= 150) {
+          status = "Needs Attention";
+          color = "yellow";
+        } else {
+          status = "Needs Work";
+          color = "red";
+        }
+        
+        topics.push({
+          name: "Arm Path",
+          status: status,
+          color: color,
+          explanation: "Your trail arm extension creates swing width and power potential. More extension at the top means more room to accelerate through impact."
+        });
+      }
+      
+      if (metrics.tempo) {
+        const ratio = metrics.tempo.ratio;
+        let status, color;
+        
+        if (ratio <= 3.0) {
+          status = "On Track";
+          color = "green";
+        } else if (ratio <= 4.0) {
+          status = "Needs Attention";
+          color = "yellow";
+        } else {
+          status = "Needs Work";
+          color = "red";
+        }
+        
+        topics.push({
+          name: "Tempo",
+          status: status,
+          color: color,
+          explanation: "Good tempo creates rhythm and timing. A rushed downswing can cause inconsistent contact and loss of power."
+        });
+      }
+      
+      topics.forEach(topic => {
+        html += `
+          <div class="disclosure-item">
+            <div class="disclosure-header">
+              <span class="status-dot ${topic.color}"></span>
+              <span class="topic-name">${topic.name}: ${topic.status}</span>
+              <details class="disclosure-details">
+                <summary class="disclosure-summary">Want to understand ${topic.name.toLowerCase()}?</summary>
+                <div class="disclosure-content">
+                  <p>${topic.explanation}</p>
+                </div>
+              </details>
+            </div>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      return html;
+    }
+    
+    // NUKE 78: Recast System Voice as a Golf Pal, Not a System
+    function generateGolfPalVoice(metrics) {
+      let html = '<div class="golf-pal-voice"><h4>👨‍🏫 Coach\'s Take</h4>';
+      
+      const feedback = [];
+      
+      if (metrics.spine_drift && metrics.spine_drift.max_drift > 12) {
+        feedback.push("Nice swing. Want to keep more structure through your lower body next time? That's what helps compress the ball like the pros do.");
+      }
+      
+      if (metrics.elbow_extension && metrics.elbow_extension.max_extension < 150) {
+        feedback.push("Good move. Let's get a bit more extension at the top — that's where the power lives.");
+      }
+      
+      if (metrics.tempo && metrics.tempo.ratio > 3.0) {
+        feedback.push("Solid swing. Try slowing down that backswing just a touch — it'll help you find better rhythm.");
+      }
+      
+      if (feedback.length === 0) {
+        feedback.push("Great swing! You're building good habits. Keep it up!");
+      }
+      
+      feedback.forEach(fb => {
+        html += `
+          <div class="golf-pal-message">
+            <p>${fb}</p>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      return html;
+    }
+    
+    // NUKE 79: User-Defined Feedback Focus
+    function generateUserDefinedFocus(metrics) {
+      let html = '<div class="user-defined-focus"><h4>🎯 What Do You Want to Focus On?</h4>';
+      
+      html += `
+        <div class="focus-options">
+          <button class="focus-option" onclick="setFeedbackMode('quick')">
+            <span class="focus-icon">✋</span>
+            <div class="focus-content">
+              <h5>Quick Tip</h5>
+              <p>Just give me one fix</p>
+            </div>
+          </button>
+          
+          <button class="focus-option" onclick="setFeedbackMode('coach')">
+            <span class="focus-icon">🔍</span>
+            <div class="focus-content">
+              <h5>Coach Mode</h5>
+              <p>Show me everything</p>
+            </div>
+          </button>
+          
+          <button class="focus-option" onclick="setFeedbackMode('deep')">
+            <span class="focus-icon">🧠</span>
+            <div class="focus-content">
+              <h5>Deep Dive</h5>
+              <p>Teach me why it matters</p>
+            </div>
+          </button>
+        </div>
+      `;
+      
+      // Show current mode feedback
+      const currentMode = mockLocalStorage.feedbackMode || 'coach';
+      const modeFeedback = generateModeSpecificFeedback(metrics, currentMode);
+      html += modeFeedback;
+      
+      html += '</div>';
+      return html;
+    }
+    
+    // NUKE 80: Language Mapping by Golfer Type
+    function generateLanguageMapping(metrics) {
+      const userType = mockLocalStorage.userSkillLevel || 'beginner';
+      let html = '<div class="language-mapping"><h4>👤 Personalized for You</h4>';
+      
+      const feedback = [];
+      
+      if (metrics.spine_drift && metrics.spine_drift.max_drift > 12) {
+        switch(userType) {
+          case 'beginner':
+            feedback.push("Let's build good habits early — try to keep your posture steady through the swing.");
+            break;
+          case 'junior':
+            feedback.push("Nice job keeping your arms straight — you're learning fast! Now let's work on staying down through impact.");
+            break;
+          case 'senior':
+            feedback.push("Good structure. Let's ease the transition just a touch to maintain that spine angle.");
+            break;
+          case 'female':
+            feedback.push("Solid base — now let's use the ground more through impact to keep that posture stable.");
+            break;
+          case 'competitive':
+            feedback.push("Strong move. Let's tighten that spine angle through the downswing for better compression.");
+            break;
+          default:
+            feedback.push("Good swing. Focus on maintaining your spine angle through impact for better consistency.");
+        }
+      }
+      
+      if (metrics.elbow_extension && metrics.elbow_extension.max_extension < 150) {
+        switch(userType) {
+          case 'beginner':
+            feedback.push("Let's work on getting your arms extended more at the top — this creates power.");
+            break;
+          case 'junior':
+            feedback.push("Great effort! Now let's get a bit more extension at the top — that's where the power lives.");
+            break;
+          case 'senior':
+            feedback.push("Good width. Let's extend that trail arm just a bit more for extra power.");
+            break;
+          case 'female':
+            feedback.push("Nice width. Let's get a bit more extension at the top — this will help with distance.");
+            break;
+          case 'competitive':
+            feedback.push("Strong backswing. Let's maximize that trail arm extension for optimal power generation.");
+            break;
+          default:
+            feedback.push("Good swing. Try extending your trail arm more at the top for better power.");
+        }
+      }
+      
+      if (feedback.length === 0) {
+        switch(userType) {
+          case 'beginner':
+            feedback.push("Excellent! You're building great fundamentals. Keep practicing!");
+            break;
+          case 'junior':
+            feedback.push("Awesome swing! You're learning fast and building good habits.");
+            break;
+          case 'senior':
+            feedback.push("Beautiful swing. You're showing great technique and consistency.");
+            break;
+          case 'female':
+            feedback.push("Fantastic swing! You're demonstrating excellent form and control.");
+            break;
+          case 'competitive':
+            feedback.push("Outstanding swing. You're showing elite-level technique and control.");
+            break;
+          default:
+            feedback.push("Great swing! Keep up the good work.");
+        }
+      }
+      
+      feedback.forEach(fb => {
+        html += `
+          <div class="personalized-message">
+            <p>${fb}</p>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      return html;
+    }
+    
+    // Helper functions
+    function setFeedbackMode(mode) {
+      mockLocalStorage.feedbackMode = mode;
+      alert(`Feedback mode set to: ${mode}`);
+    }
+    
+    function generateModeSpecificFeedback(metrics, mode) {
+      let html = '<div class="mode-feedback">';
+      
+      switch(mode) {
+        case 'quick':
+          html += '<h5>Quick Tip</h5>';
+          if (metrics.spine_drift && metrics.spine_drift.max_drift > 12) {
+            html += '<p>Focus on maintaining your spine angle through impact. This will improve your ball-striking consistency.</p>';
+          } else if (metrics.elbow_extension && metrics.elbow_extension.max_extension < 150) {
+            html += '<p>Extend your trail arm more at the top of your backswing for better power generation.</p>';
+          } else {
+            html += '<p>Great swing! Keep practicing to maintain this good form.</p>';
+          }
+          break;
+          
+        case 'coach':
+          html += '<h5>Coach Mode</h5>';
+          html += '<p>Here\'s your complete swing analysis with all the details and recommendations.</p>';
+          break;
+          
+        case 'deep':
+          html += '<h5>Deep Dive</h5>';
+          html += '<p>Let\'s understand the biomechanics behind your swing and how each element affects your ball flight.</p>';
+          break;
+      }
+      
+      html += '</div>';
+      return html;
+    }
+    
+    // Test functions
+    function testGolfLanguage() {
+      document.getElementById('golfLanguageResult').innerHTML = generateGolfLanguageOnly(mockMetrics);
+    }
+    
+    function testProgressiveDisclosure() {
+      document.getElementById('progressiveDisclosureResult').innerHTML = generateProgressiveDisclosure(mockMetrics);
+    }
+    
+    function testGolfPalVoice() {
+      document.getElementById('golfPalVoiceResult').innerHTML = generateGolfPalVoice(mockMetrics);
+    }
+    
+    function testUserDefinedFocus() {
+      document.getElementById('userDefinedFocusResult').innerHTML = generateUserDefinedFocus(mockMetrics);
+    }
+    
+    function testLanguageMapping() {
+      document.getElementById('languageMappingResult').innerHTML = generateLanguageMapping(mockMetrics);
+    }
+  </script>
+</body>
+</html> 

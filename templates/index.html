@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swing Sage - Upload</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 2rem;
+      text-align: center;
+      color: white;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 1rem;
+      font-weight: 300;
+    }
+
+    p {
+      font-size: 1.1em;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+
+    #uploadForm {
+      margin: 2rem 0;
+    }
+
+    #videoInput {
+      display: none;
+    }
+
+    .file-upload-area {
+      border: 3px dashed rgba(255, 255, 255, 0.5);
+      border-radius: 15px;
+      padding: 2rem;
+      margin: 1rem 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .file-upload-area:hover {
+      border-color: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .file-upload-area.dragover {
+      border-color: #00ff00;
+      background: rgba(0, 255, 0, 0.1);
+    }
+
+    .upload-icon {
+      font-size: 3em;
+      margin-bottom: 1rem;
+    }
+
+    .upload-text {
+      font-size: 1.1em;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+      color: #000;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: bold;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 255, 0, 0.3);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #status {
+      margin: 1rem 0;
+      font-weight: bold;
+      font-size: 1.1em;
+      min-height: 2rem;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #00ff00;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    #resultVideo {
+      margin-top: 1rem;
+      max-width: 100%;
+      height: auto;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    #coaching {
+      margin-top: 2rem;
+      font-size: 1.2rem;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1.5rem;
+      border-radius: 15px;
+      border-left: 5px solid #00ff00;
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    .error {
+      background: rgba(255, 0, 0, 0.2);
+      color: #ffcccc;
+      padding: 1rem;
+      border-radius: 10px;
+      margin: 1rem 0;
+      border-left: 5px solid #ff0000;
+    }
+
+    .success {
+      background: rgba(0, 255, 0, 0.2);
+      color: #ccffcc;
+      padding: 1rem;
+      border-radius: 10px;
+      margin: 1rem 0;
+      border-left: 5px solid #00ff00;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .container {
+        padding: 1.5rem;
+      }
+      
+      h1 {
+        font-size: 2em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🏌️ Swing Sage</h1>
+    <p>Upload your golf swing video to receive personalized coaching feedback.</p>
+
+    <form id="uploadForm">
+      <div class="file-upload-area" id="uploadArea">
+        <div class="upload-icon">📹</div>
+        <div class="upload-text">Click to select your swing video</div>
+        <input type="file" name="video" id="videoInput" accept="video/*" required>
+        <button type="button" id="selectBtn">Choose Video File</button>
+      </div>
+      
+      <button type="submit" id="analyzeBtn" disabled>Analyze Swing</button>
+    </form>
+
+    <div id="status"></div>
+
+    <video id="resultVideo" controls style="display:none;"></video>
+    <div id="coaching"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const statusDiv = document.getElementById('status');
+    const videoEl = document.getElementById('resultVideo');
+    const coachingEl = document.getElementById('coaching');
+    const uploadArea = document.getElementById('uploadArea');
+    const videoInput = document.getElementById('videoInput');
+    const selectBtn = document.getElementById('selectBtn');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+
+    // File selection
+    selectBtn.onclick = () => videoInput.click();
+    
+    uploadArea.onclick = () => videoInput.click();
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        videoInput.files = files;
+        handleFileSelect();
+      }
+    });
+
+    videoInput.addEventListener('change', handleFileSelect);
+
+    function handleFileSelect() {
+      const file = videoInput.files[0];
+      if (file) {
+        // Validate file type
+        const allowedTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/quicktime'];
+        if (!allowedTypes.includes(file.type)) {
+          showError('Please upload a valid video file (MP4, AVI, MOV)');
+          return;
+        }
+
+        // Validate file size (16MB max)
+        if (file.size > 16 * 1024 * 1024) {
+          showError('File size must be less than 16MB');
+          return;
+        }
+
+        analyzeBtn.disabled = false;
+        uploadArea.querySelector('.upload-text').textContent = `Selected: ${file.name}`;
+        showSuccess('Video selected! Click "Analyze Swing" to continue.');
+      }
+    }
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const file = videoInput.files[0];
+
+      if (!file) {
+        showError("Please select a video file.");
+        return;
+      }
+
+      // Show analyzing status
+      statusDiv.innerHTML = '<span class="spinner"></span>Analyzing your swing... ⛳';
+      coachingEl.textContent = "";
+      videoEl.style.display = "none";
+      analyzeBtn.disabled = true;
+
+      const formData = new FormData();
+      formData.append("video", file);
+
+      try {
+        const res = await fetch("/analyze", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          // Show results
+          videoEl.src = data.video_url;
+          videoEl.style.display = "block";
+          coachingEl.innerHTML = `<strong>💬 Coach's Take:</strong><br>${data.coaching_tip}`;
+          statusDiv.innerHTML = "Analysis complete ✅";
+          showSuccess('Your swing analysis is ready!');
+          
+          // Scroll to results
+          videoEl.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          showError(data.error || "Something went wrong during analysis.");
+          statusDiv.textContent = "Analysis failed ❌";
+        }
+      } catch (err) {
+        showError("Upload failed. Please check your connection and try again.");
+        statusDiv.textContent = "Network error ❌";
+      } finally {
+        analyzeBtn.disabled = false;
+      }
+    };
+
+    function showError(message) {
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error';
+      errorDiv.textContent = message;
+      
+      // Remove any existing error messages
+      const existingErrors = document.querySelectorAll('.error');
+      existingErrors.forEach(err => err.remove());
+      
+      statusDiv.parentNode.insertBefore(errorDiv, statusDiv.nextSibling);
+      
+      // Remove error after 5 seconds
+      setTimeout(() => {
+        errorDiv.remove();
+      }, 5000);
+    }
+
+    function showSuccess(message) {
+      const successDiv = document.createElement('div');
+      successDiv.className = 'success';
+      successDiv.textContent = message;
+      
+      // Remove any existing success messages
+      const existingSuccess = document.querySelectorAll('.success');
+      existingSuccess.forEach(succ => succ.remove());
+      
+      statusDiv.parentNode.insertBefore(successDiv, statusDiv.nextSibling);
+      
+      // Remove success after 5 seconds
+      setTimeout(() => {
+        successDiv.remove();
+      }, 5000);
+    }
+  </script>
+
+</body>
+</html> 

@@ -1,0 +1,557 @@
+<!-- templates/landing.html - REPLACE existing landing.html with PWA-enhanced version -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swing Sage - Your AI Golf Coach</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- iOS PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Swing Sage">
+    <link rel="apple-touch-icon" href="/static/images/icon-192x192.png">
+    
+    <!-- Android PWA Support -->
+    <meta name="theme-color" content="#00ff88">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- Windows PWA Support -->
+    <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="msapplication-TileImage" content="/static/images/icon-144x144.png">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/static/css/app.css" as="style">
+    <link rel="preload" href="/static/js/app.js" as="script">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            /* Prevent bounce scrolling on iOS */
+            overscroll-behavior: none;
+        }
+        
+        .hero {
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            /* Smooth animations */
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 300;
+            background: linear-gradient(135deg, #00ff88, #ffffff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .tagline {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+        
+        .cta-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .cta-btn {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .cta-btn:hover::before {
+            left: 100%;
+        }
+        
+        .cta-btn.primary {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+            color: #000;
+            border-color: transparent;
+            font-weight: 600;
+        }
+        
+        .cta-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 1rem;
+        }
+        
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .cta-btn:active {
+            transform: translateY(0);
+        }
+        
+        .features {
+            margin-top: 2rem;
+            font-size: 0.95rem;
+            opacity: 0.8;
+        }
+        
+        .feature {
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .install-banner {
+            position: fixed;
+            bottom: -100px;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+            color: #000;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+            transition: bottom 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .install-banner.show {
+            bottom: 0;
+        }
+        
+        .install-text {
+            flex: 1;
+        }
+        
+        .install-btn {
+            background: rgba(0, 0, 0, 0.1);
+            border: none;
+            color: #000;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+        
+        .close-install {
+            background: none;
+            border: none;
+            color: #000;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+        
+        .offline-indicator {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff6b6b;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: none;
+            z-index: 1001;
+        }
+        
+        .offline-indicator.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-100%); }
+            to { transform: translateX(-50%) translateY(0); }
+        }
+        
+        /* iOS Safari specific fixes */
+        @supports (-webkit-touch-callout: none) {
+            .hero {
+                /* Prevent iOS zoom on double tap */
+                touch-action: manipulation;
+            }
+            
+            body {
+                /* Fix iOS viewport height issue */
+                min-height: -webkit-fill-available;
+            }
+        }
+        
+        /* Loading states */
+        .cta-btn.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        .cta-btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            margin: auto;
+            border: 2px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            right: 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 480px) {
+            h1 { font-size: 2.5rem; }
+            .hero { padding: 2rem 1.5rem; }
+            .cta-options { gap: 0.8rem; }
+            .install-banner { padding: 0.8rem; }
+            .install-text { font-size: 0.9rem; }
+        }
+        
+        @media (min-width: 480px) {
+            .cta-options {
+                flex-direction: row;
+                justify-content: center;
+            }
+        }
+        
+        /* Reduce motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .hero {
+                border: 2px solid white;
+            }
+            
+            .cta-btn {
+                border-width: 3px;
+            }
+        }
+        
+        /* Dark mode support (future enhancement) */
+        @media (prefers-color-scheme: dark) {
+            /* Already dark by default */
+        }
+    </style>
+</head>
+<body>
+    <!-- Offline indicator -->
+    <div id="offlineIndicator" class="offline-indicator">
+        📶 You're offline
+    </div>
+    
+    <!-- Install banner -->
+    <div id="installBanner" class="install-banner">
+        <div class="install-text">
+            <strong>📱 Install Swing Sage</strong><br>
+            Get the full app experience!
+        </div>
+        <button id="installBtn" class="install-btn">Install</button>
+        <button id="closeInstall" class="close-install">&times;</button>
+    </div>
+    
+    <div class="hero">
+        <h1>🏌️ Swing Sage</h1>
+        <div class="tagline">Your personal AI golf coach in your pocket. Get instant, feel-based feedback that actually helps you improve.</div>
+        
+        <div class="cta-options">
+            <a href="/calibrate" class="cta-btn primary" id="recordBtn">
+                📹 Record New Swing
+            </a>
+            <a href="/upload" class="cta-btn secondary" id="uploadBtn">
+                📁 Upload Existing Video
+            </a>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <span>⚡</span>
+                <span>Instant AI analysis</span>
+            </div>
+            <div class="feature">
+                <span>🎯</span>
+                <span>Feel-based coaching tips</span>
+            </div>
+            <div class="feature">
+                <span>📈</span>
+                <span>Progress tracking</span>
+            </div>
+            <div class="feature">
+                <span>📱</span>
+                <span>Works offline</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PWA and mobile optimization JavaScript
+        let deferredPrompt;
+        let installBanner = document.getElementById('installBanner');
+        let installBtn = document.getElementById('installBtn');
+        let closeInstall = document.getElementById('closeInstall');
+        let offlineIndicator = document.getElementById('offlineIndicator');
+        
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('/static/sw.js');
+                    console.log('Service Worker registered successfully:', registration);
+                    
+                    // Listen for service worker updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // New version available, could show update prompt
+                                console.log('New version available');
+                            }
+                        });
+                    });
+                    
+                } catch (error) {
+                    console.log('Service Worker registration failed:', error);
+                }
+            });
+        }
+        
+        // Handle PWA install prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install banner after 3 seconds
+            setTimeout(() => {
+                if (!localStorage.getItem('installPromptDismissed')) {
+                    installBanner.classList.add('show');
+                }
+            }, 3000);
+        });
+        
+        // Install button click
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const choiceResult = await deferredPrompt.userChoice;
+                
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                    gtag('event', 'pwa_install', { method: 'prompt' });
+                } else {
+                    console.log('User dismissed the install prompt');
+                }
+                
+                deferredPrompt = null;
+                installBanner.classList.remove('show');
+            }
+        });
+        
+        // Close install banner
+        closeInstall.addEventListener('click', () => {
+            installBanner.classList.remove('show');
+            localStorage.setItem('installPromptDismissed', 'true');
+        });
+        
+        // Handle online/offline status
+        function updateOnlineStatus() {
+            if (navigator.onLine) {
+                offlineIndicator.classList.remove('show');
+                document.body.classList.remove('offline');
+            } else {
+                offlineIndicator.classList.add('show');
+                document.body.classList.add('offline');
+            }
+        }
+        
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        updateOnlineStatus();
+        
+        // Enhanced button interactions
+        document.querySelectorAll('.cta-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                // Add loading state
+                this.classList.add('loading');
+                
+                // Remove loading state after navigation starts
+                setTimeout(() => {
+                    this.classList.remove('loading');
+                }, 1000);
+            });
+        });
+        
+        // Touch feedback for mobile
+        document.querySelectorAll('.cta-btn').forEach(btn => {
+            btn.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            btn.addEventListener('touchend', function() {
+                this.style.transform = '';
+            });
+        });
+        
+        // Prevent iOS double-tap zoom
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+        
+        // Haptic feedback for supported devices
+        function triggerHapticFeedback(type = 'light') {
+            if ('vibrate' in navigator) {
+                switch(type) {
+                    case 'light':
+                        navigator.vibrate(10);
+                        break;
+                    case 'medium':
+                        navigator.vibrate(20);
+                        break;
+                    case 'heavy':
+                        navigator.vibrate([20, 10, 20]);
+                        break;
+                }
+            }
+        }
+        
+        // Add haptic feedback to button clicks
+        document.querySelectorAll('.cta-btn').forEach(btn => {
+            btn.addEventListener('click', () => triggerHapticFeedback('light'));
+        });
+        
+        // Handle PWA display mode
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            console.log('Running as PWA');
+            document.body.classList.add('pwa-mode');
+            
+            // Hide install banner if already installed
+            installBanner.style.display = 'none';
+            
+            // Track PWA usage
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'pwa_usage', { method: 'standalone' });
+            }
+        }
+        
+        // Preload critical pages
+        function preloadPage(url) {
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.href = url;
+            document.head.appendChild(link);
+        }
+        
+        // Preload upload page after 2 seconds
+        setTimeout(() => {
+            preloadPage('/upload');
+            preloadPage('/calibrate');
+        }, 2000);
+        
+        // Performance monitoring
+        window.addEventListener('load', () => {
+            // Log performance metrics
+            if ('performance' in window) {
+                const perfData = performance.getEntriesByType('navigation')[0];
+                console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart);
+                
+                // Track Core Web Vitals (would implement with web-vitals library)
+                // getCLS(console.log);
+                // getFID(console.log);  
+                // getFCP(console.log);
+                // getLCP(console.log);
+                // getTTFB(console.log);
+            }
+        });
+        
+        console.log('Swing Sage PWA initialized successfully');
+    </script>
+    
+    <!-- Google Analytics (optional) -->
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script> -->
+    <!-- <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+    </script> -->
+</body>
+</html> 

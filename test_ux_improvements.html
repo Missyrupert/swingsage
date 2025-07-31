@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UX Improvements Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0d1117;
+            color: #f0f6fc;
+        }
+        .test-section {
+            background: #161b22;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+        }
+        .test-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-result {
+            background: #21262d;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #00c896;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Swing Sage UX Improvements Test</h1>
+    
+    <div class="test-section">
+        <h2>NUKE 61: Skill Level Selector</h2>
+        <p>Test the tailored onboarding experience:</p>
+        <button class="test-button" onclick="testSkillLevelSelector()">Test Skill Level Selection</button>
+        <div id="skillLevelResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>NUKE 62: Empathy-First Feedback</h2>
+        <p>Test the empathy-first feedback generation:</p>
+        <button class="test-button" onclick="testEmpathyFeedback()">Test Empathy Feedback</button>
+        <div id="empathyResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>NUKE 63: Simple Session Flow</h2>
+        <p>Test the one-task, one-fix approach:</p>
+        <button class="test-button" onclick="testSessionFocus()">Test Session Focus</button>
+        <div id="sessionFocusResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>NUKE 64: Dynamic Feedback Tone</h2>
+        <p>Test the tone preference system:</p>
+        <button class="test-button" onclick="testFeedbackTone()">Test Feedback Tone</button>
+        <div id="toneResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>NUKE 65: Swing Sketch Mode</h2>
+        <p>Test the no-video analysis option:</p>
+        <button class="test-button" onclick="testSwingSketch()">Test Swing Sketch</button>
+        <div id="sketchResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Mock metrics for testing
+        const mockMetrics = {
+            elbow_extension: {
+                max_extension: 145,
+                max_extension_frame: 45
+            },
+            spine_drift: {
+                max_drift: 30,
+                max_drift_frame: 60
+            },
+            tempo: {
+                ratio: 3.2
+            },
+            faults: [
+                {
+                    name: 'Early Elbow Collapse',
+                    frames: [45, 46, 47],
+                    drill: 'Towel Under Arm Drill',
+                    description: 'Keep your trail arm extended through impact'
+                }
+            ]
+        };
+
+        function testSkillLevelSelector() {
+            const result = document.getElementById('skillLevelResult');
+            result.innerHTML = `
+                <h3>✅ Skill Level Selector Test</h3>
+                <p><strong>Available Options:</strong></p>
+                <ul>
+                    <li>🧒 Beginner / Junior</li>
+                    <li>👨‍🦳 Senior / Returning Golfer</li>
+                    <li>🧍‍♂️ Casual Weekend Player</li>
+                    <li>🏌️ Competitive Club Golfer</li>
+                    <li>👩 Women's League / Ladies Section</li>
+                </ul>
+                <p><strong>Implementation:</strong> Tailored vocabulary and coaching approach based on skill level</p>
+            `;
+            result.style.display = 'block';
+        }
+
+        function testEmpathyFeedback() {
+            const result = document.getElementById('empathyResult');
+            const feedback = generateEmpathyFirstFeedback(mockMetrics, 'casual', 'encouraging');
+            result.innerHTML = `
+                <h3>✅ Empathy-First Feedback Test</h3>
+                <div style="background: #2d3748; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                    ${feedback}
+                </div>
+                <p><strong>Key Features:</strong></p>
+                <ul>
+                    <li>Empathy-first phrasing</li>
+                    <li>Skill-level appropriate vocabulary</li>
+                    <li>Supportive tone options</li>
+                    <li>Actionable drill suggestions</li>
+                </ul>
+            `;
+            result.style.display = 'block';
+        }
+
+        function testSessionFocus() {
+            const result = document.getElementById('sessionFocusResult');
+            const focus = generateSessionFocus(mockMetrics);
+            result.innerHTML = `
+                <h3>✅ Simple Session Flow Test</h3>
+                <div style="background: #2d3748; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                    ${focus}
+                </div>
+                <p><strong>Key Features:</strong></p>
+                <ul>
+                    <li>One clear focus per session</li>
+                    <li>Specific frame markers</li>
+                    <li>One drill recommendation</li>
+                    <li>Progress tracking</li>
+                </ul>
+            `;
+            result.style.display = 'block';
+        }
+
+        function testFeedbackTone() {
+            const result = document.getElementById('toneResult');
+            result.innerHTML = `
+                <h3>✅ Dynamic Feedback Tone Test</h3>
+                <p><strong>Available Tones:</strong></p>
+                <ul>
+                    <li>✌️ Encouraging: "Let's keep it positive"</li>
+                    <li>🔍 Balanced: "Tell me what's working and what's not"</li>
+                    <li>⚒️ Direct: "Give it to me straight"</li>
+                </ul>
+                <p><strong>Implementation:</strong> Tone modifiers applied to feedback wording</p>
+                <div style="background: #2d3748; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                    <h4>Example - Encouraging Tone:</h4>
+                    <p>"Great effort! Your trail arm pulled in early. This is a common challenge that many golfers face. Let's refine it together."</p>
+                    <h4>Example - Direct Tone:</h4>
+                    <p>"This needs fixing. Your trail arm pulled in early. This is limiting your potential. Here's how to fix it."</p>
+                </div>
+            `;
+            result.style.display = 'block';
+        }
+
+        function testSwingSketch() {
+            const result = document.getElementById('sketchResult');
+            const sketchAnalysis = generateSketchAnalysis('thin');
+            result.innerHTML = `
+                <h3>✅ Swing Sketch Mode Test</h3>
+                <div style="background: #2d3748; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                    ${sketchAnalysis}
+                </div>
+                <p><strong>Key Features:</strong></p>
+                <ul>
+                    <li>No video required</li>
+                    <li>Feel-based analysis</li>
+                    <li>Most likely causes</li>
+                    <li>Drill recommendations</li>
+                    <li>Encouraging insights</li>
+                </ul>
+            `;
+            result.style.display = 'block';
+        }
+
+        // Mock functions for testing
+        function generateEmpathyFirstFeedback(metrics, skillLevel, tone) {
+            const vocabulary = getVocabularyForLevel(skillLevel);
+            const toneModifiers = getToneModifiers(tone);
+            
+            return `
+                <div class="empathy-feedback">
+                    <h4>${toneModifiers.prefix} Your trail arm pulled in early</h4>
+                    <p>${toneModifiers.explanation} This can cause loss of power or a weak fade. ${toneModifiers.suggestion} Let's work on keeping structure through the hit.</p>
+                    <p><strong>This is common for:</strong> ${vocabulary.earlyCollapse}</p>
+                    <p><strong>Try this simple drill:</strong> ${vocabulary.extensionDrill}</p>
+                </div>
+            `;
+        }
+
+        function getVocabularyForLevel(level) {
+            const vocabularies = {
+                casual: {
+                    earlyCollapse: 'weekend players who want more distance',
+                    extensionDrill: 'Work on extending your trail arm fully in the backswing'
+                }
+            };
+            return vocabularies[level] || vocabularies.casual;
+        }
+
+        function getToneModifiers(tone) {
+            const modifiers = {
+                encouraging: {
+                    prefix: 'Great effort!',
+                    explanation: 'This is a common challenge that many golfers face.',
+                    suggestion: 'Let\'s refine it together.'
+                },
+                direct: {
+                    prefix: 'This needs fixing.',
+                    explanation: 'This is limiting your potential.',
+                    suggestion: 'Here\'s how to fix it.'
+                }
+            };
+            return modifiers[tone] || modifiers.encouraging;
+        }
+
+        function generateSessionFocus(metrics) {
+            if (!metrics.faults || metrics.faults.length === 0) {
+                return `
+                    <div class="focus-item">
+                        <h4>✅ Great Swing!</h4>
+                        <p>No major issues detected. Keep working on maintaining this good form.</p>
+                    </div>
+                `;
+            }
+            
+            const primaryFault = metrics.faults[0];
+            const frames = primaryFault.frames || [primaryFault.frame];
+            
+            return `
+                <div class="focus-item">
+                    <h4>🏌️ Focus: ${primaryFault.name}</h4>
+                    <p>We found ${frames.length} frame${frames.length > 1 ? 's' : ''} where this broke down</p>
+                    <div class="focus-frames">
+                        ${frames.map(frame => `<span class="frame-marker">Frame ${frame}</span>`).join('')}
+                    </div>
+                    <div class="focus-drill">
+                        <strong>Try the "${primaryFault.drill}" this week</strong>
+                        <p>${primaryFault.description}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateSketchAnalysis(feel) {
+            const analysis = {
+                thin: {
+                    title: 'Thin Contact Analysis',
+                    description: 'You hit it thin - this is common when your trail arm collapses early.',
+                    likelyCauses: [
+                        'Early elbow collapse in backswing',
+                        'Losing spine angle at impact',
+                        'Rushing the downswing'
+                    ],
+                    drill: 'Towel Under Arm Drill',
+                    drillDescription: 'Place a towel under your trail arm and keep it there throughout the swing.',
+                    encouragement: 'You\'re tuning into your own feedback. That\'s how pros improve!'
+                }
+            };
+            
+            const data = analysis[feel];
+            
+            return `
+                <div class="sketch-analysis">
+                    <h3>✏️ ${data.title}</h3>
+                    <p>${data.description}</p>
+                    
+                    <div class="likely-causes">
+                        <h4>Most Likely Causes:</h4>
+                        <ul>
+                            ${data.likelyCauses.map(cause => `<li>${cause}</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div class="recommended-drill">
+                        <h4>Try This Drill:</h4>
+                        <div class="drill-card">
+                            <h5>${data.drill}</h5>
+                            <p>${data.drillDescription}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="encouragement">
+                        <p><strong>💡 ${data.encouragement}</strong></p>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html> 

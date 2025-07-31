@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Swing Analysis - Swing Sage</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 1rem;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .header { text-align: center; margin-bottom: 2rem; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; font-weight: 300; }
+        .header p { opacity: 0.8; font-size: 1.1rem; }
+        
+        .video-container {
+            position: relative;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .coaching-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-left: 5px solid #00ff88;
+        }
+        
+        .coaching-card h2 {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .coaching-card p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .action-btn.primary {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+            color: #000;
+            border-color: transparent;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .metric {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #00ff88;
+        }
+        
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+        
+        @media (max-width: 600px) {
+            .actions { grid-template-columns: 1fr; }
+            .header h1 { font-size: 2rem; }
+            .container { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Your Swing Analysis</h1>
+            <p>Here's what we found and how to improve</p>
+        </div>
+
+        <div class="video-container">
+            <video controls preload="metadata">
+                <source src="{{ analysis.video_url }}" type="video/mp4">
+                Your browser doesn't support video playback.
+            </video>
+        </div>
+
+        <div class="coaching-card">
+            <h2>💬 Your Coach Says</h2>
+            <p>{{ analysis.coaching_tip }}</p>
+        </div>
+
+        {% if analysis.metrics %}
+        <div class="metrics">
+            <div class="metric">
+                <div class="metric-value">{{ "%.0f"|format(analysis.metrics.collapse_percentage) }}%</div>
+                <div class="metric-label">Trail Arm Issues</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">{{ "%.0f"|format(analysis.metrics.posture_loss_percentage) }}%</div>
+                <div class="metric-label">Posture Changes</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">{{ analysis.metrics.total_frames }}</div>
+                <div class="metric-label">Frames Analyzed</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="actions">
+            <a href="/upload" class="action-btn primary">📹 Analyze Another Swing</a>
+            <a href="/" class="action-btn">🏠 Back to Home</a>
+        </div>
+    </div>
+</body>
+</html> 

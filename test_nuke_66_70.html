@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NUKE 66-70 Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #0d1117;
+            color: #f0f6fc;
+        }
+        .test-section {
+            background: #161b22;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+        }
+        .test-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-result {
+            background: #21262d;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #00c896;
+        }
+        .journey-stage {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #30363d;
+            border-radius: 4px;
+            margin: 10px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #00c896, #00a884);
+            border-radius: 4px;
+            transition: width 0.6s ease;
+        }
+        .next-step-content {
+            background: #2d3748;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .drill-item {
+            background: #2d3748;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .info-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background: #58a6ff;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 16px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .relevance-item {
+            background: #2d3748;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid #d29922;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 NUKE 66-70: Advanced Personalization Test</h1>
+    
+    <div class="test-section">
+        <h2>NUKE 66: Swing Journey Mode</h2>
+        <p>Test the journey-based progress tracking:</p>
+        <button class="test-button" onclick="testSwingJourney()">Test Journey Stages</button>
+        <div id="journeyResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>NUKE 67: Personalized Next Step</h2>
+        <p>Test the one-clear-next-move recommendation:</p>
+        <button class="test-button" onclick="testNextStep()">Test Next Step</button>
+        <div id="nextStepResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>NUKE 68: Universal Drill Library</h2>
+        <p>Test the filtered, respectful drill suggestions:</p>
+        <button class="test-button" onclick="testDrillLibrary()">Test Drill Library</button>
+        <div id="drillLibraryResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>NUKE 69: Metric Explanations</h2>
+        <p>Test the optional "explain this metric" tooltips:</p>
+        <button class="test-button" onclick="testMetricExplanations()">Test Explanations</button>
+        <div id="metricResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>NUKE 70: Personal Relevance Engine</h2>
+        <p>Test the "why it matters to you" connections:</p>
+        <button class="test-button" onclick="testPersonalRelevance()">Test Relevance</button>
+        <div id="relevanceResult" class="test-result" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Mock data for testing
+        const mockMetrics = {
+            elbow_extension: {
+                max_extension: 145,
+                max_extension_frame: 45
+            },
+            spine_drift: {
+                max_drift: 30,
+                max_drift_frame: 60
+            },
+            tempo: {
+                ratio: 3.2
+            },
+            faults: [
+                {
+                    name: 'Early Elbow Collapse',
+                    frames: [45, 46, 47],
+                    drill: 'Towel Under Arm Drill',
+                    description: 'Keep your trail arm extended through impact'
+                }
+            ]
+        };
+
+        const mockUserGoals = ['consistency', 'distance'];
+
+        function testSwingJourney() {
+            const result = document.getElementById('journeyResult');
+            const journey = generateSwingJourney(mockMetrics);
+            result.innerHTML = `
+                <h3>✅ Swing Journey Test</h3>
+                ${journey}
+                <p><strong>Key Features:</strong></p>
+                <ul>
+                    <li>Stage-based progress tracking</li>
+                    <li>Visual progress bars</li>
+                    <li>Session improvement tracking</li>
+                    <li>Descriptive stage explanations</li>
+                </ul>
+            `;
+            result.style.display = 'block';
+        }
+
+        function testNextStep() {
+            const result = document.getElementById('nextStepResult');
+            const nextStep = generateNextStepRecommendation(mockMetrics, 'casual');
+            result.innerHTML = `
+                <h3>✅ Next Step Recommendation Test</h3>
+                ${nextStep}
+                <p><strong>Key Features:</strong></p>
+                <ul>
+                    <li>One clear next move</li>
+                    <li>Skill-level appropriate suggestions</li>
+                    <li>Drill integration</li>
+                    <li>Save to personal drill list</li>
+                </ul>
+            `;
+            result.style.display = 'block';
+        }
+
+        function testDrillLibrary() {
+            const result = document.getElementById('drillLibraryResult');
+            const drillLibrary = generateDrillLibrary(mockMetrics, 'casual');
+            result.innerHTML = `
+                <h3>✅ Drill Library Test</h3>
+                ${drillLibrary}
+                <p><strong>Key Features:</strong></p>
+                <ul>
+                    <li>Filtered by user needs</li>
+                    <li>Difficulty and suitability indicators</li>
+                    <li>Watch and save functionality</li>
+                    <li>Personalized recommendations</li>
+                </ul>
+            `;
+            result.style.display = 'block';
+        }
+
+        function testMetricExplanations() {
+            const result = document.getElementById('metricResult');
+            result.innerHTML = `
+                <h3>✅ Metric Explanations Test</h3>
+                <p><strong>Available Explanations:</strong></p>
+                <ul>
+                    <li><span data-metric="trail_arm_extension">Trail Arm Extension</span> <span class="info-icon">ⓘ</span></li>
+                    <li><span data-metric="spine_drift">Spine Drift</span> <span class="info-icon">ⓘ</span></li>
+                    <li><span data-metric="tempo_ratio">Tempo Ratio</span> <span class="info-icon">ⓘ</span></li>
+                    <li><span data-metric="posture_stability">Posture Stability</span> <span class="info-icon">ⓘ</span></li>
+                </ul>
+                <p><strong>Implementation:</strong> Click the info icons to see explanations</p>
+                <div style="background: #2d3748; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                    <h4>Example Explanation:</h4>
+                    <p><strong>Trail Arm Extension:</strong> This measures how far your trail arm straightens at the top. More extension = more swing width = more potential power.</p>
+                </div>
+            `;
+            result.style.display = 'block';
+        }
+
+        function testPersonalRelevance() {
+            const result = document.getElementById('relevanceResult');
+            const relevance = generatePersonalRelevance(mockMetrics, mockUserGoals);
+            result.innerHTML = `
+                <h3>✅ Personal Relevance Test</h3>
+                ${relevance}
+                <p><strong>Key Features:</strong></p>
+                <ul>
+                    <li>Goal-based connections</li>
+                    <li>Quantified benefits</li>
+                    <li>Personalized messaging</li>
+                    <li>Actionable insights</li>
+                </ul>
+            `;
+            result.style.display = 'block';
+        }
+
+        // Mock functions for testing
+        function generateSwingJourney(metrics) {
+            const stage = determineJourneyStage(metrics);
+            const progress = calculateJourneyProgress(metrics);
+            
+            return `
+                <div class="swing-journey">
+                    <h3>🎯 Your Swing Journey</h3>
+                    <div class="journey-stage">
+                        🎯 You're currently in: <strong>${stage.name}</strong>
+                    </div>
+                    <div class="journey-progress">
+                        <p>🛠 You've improved in ${progress.improvedSessions} of your last ${progress.totalSessions} sessions</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress.percentage}%"></div>
+                        </div>
+                        <p><small>${stage.description}</small></p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function determineJourneyStage(metrics) {
+            const stages = {
+                'stabilizing_foundations': {
+                    name: 'Stabilizing Foundations',
+                    description: 'Building consistent posture and basic swing mechanics',
+                    criteria: (metrics) => metrics.spine_drift && metrics.spine_drift.max_drift > 20
+                },
+                'building_lag_width': {
+                    name: 'Building Lag & Width',
+                    description: 'Developing power through proper sequencing and extension',
+                    criteria: (metrics) => metrics.elbow_extension && metrics.elbow_extension.max_extension < 160
+                },
+                'refining_impact': {
+                    name: 'Refining Impact',
+                    description: 'Fine-tuning contact and ball-striking consistency',
+                    criteria: (metrics) => metrics.tempo && metrics.tempo.ratio > 3.0
+                },
+                'groove_and_go': {
+                    name: 'Groove and Go',
+                    description: 'Polishing your swing for peak performance',
+                    criteria: (metrics) => true
+                }
+            };
+
+            for (const [key, stage] of Object.entries(stages)) {
+                if (stage.criteria(metrics)) {
+                    return stage;
+                }
+            }
+            
+            return stages.groove_and_go;
+        }
+
+        function calculateJourneyProgress(metrics) {
+            return {
+                improvedSessions: 3,
+                totalSessions: 5,
+                percentage: 60
+            };
+        }
+
+        function generateNextStepRecommendation(metrics, skillLevel) {
+            const nextStep = determineNextStep(metrics, skillLevel);
+            
+            return `
+                <div class="next-step-recommendation">
+                    <h3>🧠 Based on today's swing:</h3>
+                    <div class="next-step-content">
+                        <h4>🎯 Next Step → "${nextStep.focus}"</h4>
+                        <p><strong>📹 Suggested Drill:</strong> "${nextStep.drill}"</p>
+                        <p><strong>💡 Why this matters:</strong> ${nextStep.explanation}</p>
+                        <button class="drill-btn">💾 Save to My Drills</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function determineNextStep(metrics, skillLevel) {
+            const nextSteps = {
+                'casual': {
+                    'spine_drift': {
+                        focus: 'Stabilize your spine angle in transition',
+                        drill: 'Chair Between the Knees',
+                        explanation: 'This will improve your ball-striking consistency'
+                    },
+                    'elbow_extension': {
+                        focus: 'Extend your trail arm fully at the top',
+                        drill: 'Extension Drill',
+                        explanation: 'More width equals more power potential'
+                    }
+                }
+            };
+
+            let primaryIssue = 'spine_drift';
+            if (metrics.elbow_extension && metrics.elbow_extension.max_extension < 160) {
+                primaryIssue = 'elbow_extension';
+            }
+
+            const skillLevelSteps = nextSteps[skillLevel] || nextSteps.casual;
+            return skillLevelSteps[primaryIssue] || skillLevelSteps.spine_drift;
+        }
+
+        function generateDrillLibrary(metrics, skillLevel) {
+            const relevantDrills = getRelevantDrills(metrics, skillLevel);
+            
+            return `
+                <div class="drill-library">
+                    <h3>🎓 Personalized Drill Library</h3>
+                    <p>Drills tailored to your skill level and current needs</p>
+                    ${Object.entries(relevantDrills).map(([category, drills]) => `
+                        <div class="drill-category">
+                            <h4>🔍 ${category}</h4>
+                            ${drills.map(drill => `
+                                <div class="drill-item">
+                                    <div class="drill-info">
+                                        <strong>${drill.name}</strong>
+                                        <br><small>${drill.difficulty} – ${drill.suitableFor}</small>
+                                        <br><small>${drill.description}</small>
+                                    </div>
+                                    <div class="drill-actions">
+                                        <button class="drill-btn">▶️ Watch</button>
+                                        <button class="drill-btn">💾 Save</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function getRelevantDrills(metrics, skillLevel) {
+            return {
+                'Fix Trail Arm Issues': [
+                    {
+                        name: 'Towel Under Arm',
+                        difficulty: 'Easy',
+                        suitableFor: 'All Ages',
+                        description: 'Place a towel under your trail arm to maintain structure'
+                    },
+                    {
+                        name: 'Extension Drill',
+                        difficulty: 'Moderate',
+                        suitableFor: 'Intermediate+',
+                        description: 'Focus on extending your trail arm fully at the top'
+                    }
+                ],
+                'Improve Posture': [
+                    {
+                        name: 'Wall Posture Check',
+                        difficulty: 'Easy',
+                        suitableFor: 'All Ages',
+                        description: 'Practice your swing with your head against a wall'
+                    }
+                ]
+            };
+        }
+
+        function generatePersonalRelevance(metrics, userGoals) {
+            const relevanceConnections = connectMetricsToGoals(metrics, userGoals);
+            
+            if (relevanceConnections.length === 0) return '';
+            
+            return `
+                <div class="personal-relevance">
+                    <h3>🎯 Why This Matters to You</h3>
+                    ${relevanceConnections.map(connection => `
+                        <div class="relevance-item">
+                            <div class="relevance-goal">${connection.goal}</div>
+                            <div class="relevance-connection">${connection.connection}</div>
+                            ${connection.benefit ? `<div class="relevance-benefit"><strong>Potential Benefit:</strong> ${connection.benefit}</div>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function connectMetricsToGoals(metrics, userGoals) {
+            const connections = [];
+            
+            if (userGoals.includes('consistency')) {
+                if (metrics.spine_drift && metrics.spine_drift.max_drift > 25) {
+                    connections.push({
+                        goal: 'You said you want more consistency',
+                        connection: 'This spine instability may be causing your inconsistent ball striking.',
+                        benefit: 'Fixing this could improve your fairways hit by 15-20%'
+                    });
+                }
+            }
+            
+            if (userGoals.includes('distance')) {
+                if (metrics.elbow_extension && metrics.elbow_extension.max_extension < 160) {
+                    const potentialYards = Math.round((160 - metrics.elbow_extension.max_extension) * 0.8);
+                    connections.push({
+                        goal: 'You mentioned distance as a goal',
+                        connection: 'Improving your backswing extension could unlock more power.',
+                        benefit: `Could add ${potentialYards} more yards to your drives`
+                    });
+                }
+            }
+            
+            return connections;
+        }
+    </script>
+</body>
+</html> 

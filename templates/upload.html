@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Your Swing - Swing Sage</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 1rem;
+            color: white;
+        }
+        .container {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 { text-align: center; margin-bottom: 2rem; font-weight: 300; }
+        .upload-area {
+            border: 3px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 2rem;
+        }
+        .upload-area:hover { border-color: rgba(255, 255, 255, 0.7); background: rgba(255, 255, 255, 0.1); }
+        .upload-area.dragover { border-color: #00ff88; background: rgba(0, 255, 136, 0.1); }
+        .upload-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .upload-text { font-size: 1.2rem; margin-bottom: 1rem; }
+        .upload-hint { font-size: 0.9rem; opacity: 0.7; }
+        #videoInput { display: none; }
+        .user-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        select option { background: #333; }
+        .analyze-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+            color: #000;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .analyze-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .analyze-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0, 255, 136, 0.3); }
+        .status {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            min-height: 2rem;
+        }
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #00ff88; animation: spin 1s ease-in-out infinite; margin-right: 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error, .success { padding: 1rem; border-radius: 8px; margin-top: 1rem; }
+        .error { background: rgba(255, 0, 0, 0.2); border-left: 4px solid #ff4444; }
+        .success { background: rgba(0, 255, 136, 0.2); border-left: 4px solid #00ff88; }
+        @media (max-width: 600px) { .user-info { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Upload Your Swing</h1>
+        
+        <form id="uploadForm">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📹</div>
+                <div class="upload-text">Drop your swing video here</div>
+                <div class="upload-hint">or click to select • MP4, MOV, AVI • Max 16MB</div>
+                <input type="file" id="videoInput" accept="video/*">
+            </div>
+
+            <div class="user-info">
+                <select id="golferType" name="golfer_type">
+                    <option value="weekend_player">Weekend golfer</option>
+                    <option value="beginner">Just starting out</option>
+                    <option value="junior">Junior player</option>
+                    <option value="senior">Senior player</option>
+                    <option value="competitive">Competitive player</option>
+                </select>
+                <select id="experience" name="experience">
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                </select>
+            </div>
+
+            <button type="submit" class="analyze-btn" id="analyzeBtn" disabled>
+                ⚡ Analyze My Swing
+            </button>
+        </form>
+
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const uploadArea = document.getElementById('uploadArea');
+        const videoInput = document.getElementById('videoInput');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const status = document.getElementById('status');
+
+        uploadArea.onclick = () => videoInput.click();
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                videoInput.files = e.dataTransfer.files;
+                handleFileSelect();
+            }
+        });
+
+        videoInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect() {
+            const file = videoInput.files[0];
+            if (!file) return;
+
+            const allowedTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/quicktime'];
+            if (!allowedTypes.includes(file.type)) {
+                showMessage('Please upload a valid video file (MP4, MOV, AVI)', 'error');
+                return;
+            }
+
+            if (file.size > 16 * 1024 * 1024) {
+                showMessage('File size must be less than 16MB', 'error');
+                return;
+            }
+
+            analyzeBtn.disabled = false;
+            uploadArea.querySelector('.upload-text').textContent = `Selected: ${file.name}`;
+            showMessage('Video ready! Click analyze when you are.', 'success');
+        }
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            
+            if (!videoInput.files[0]) {
+                showMessage('Please select a video file first', 'error');
+                return;
+            }
+
+            status.innerHTML = '<span class="spinner"></span>Analyzing your swing... this takes about 30 seconds ⏳';
+            analyzeBtn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('video', videoInput.files[0]);
+            formData.append('golfer_type', document.getElementById('golferType').value);
+            formData.append('experience', document.getElementById('experience').value);
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    status.innerHTML = '✅ Analysis complete! Redirecting...';
+                    setTimeout(() => {
+                        window.location.href = data.redirect_url;
+                    }, 1000);
+                } else {
+                    showMessage(data.error || 'Analysis failed. Please try again.', 'error');
+                }
+            } catch (err) {
+                showMessage('Upload failed. Please check your connection and try again.', 'error');
+            } finally {
+                analyzeBtn.disabled = false;
+            }
+        };
+
+        function showMessage(message, type) {
+            const existing = document.querySelector('.error, .success');
+            if (existing) existing.remove();
+
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = message;
+            status.parentNode.appendChild(div);
+
+            setTimeout(() => div.remove(), 5000);
+        }
+    </script>
+</body>
+</html> 

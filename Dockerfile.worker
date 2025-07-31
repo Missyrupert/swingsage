@@ -1,0 +1,62 @@
+# Dockerfile.worker - Background worker for video processing and AI coaching
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV FLASK_ENV=production
+ENV WORKER_TYPE=video_processing
+
+# Install system dependencies (including GPU support)
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1 \
+    libgthread-2.0-0 \
+    libgtk-3-0 \
+    libavcodec-dev \
+    libavformat-dev \
+    libswscale-dev \
+    libv4l-dev \
+    libxvidcore-dev \
+    libx264-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    libatlas-base-dev \
+    gfortran \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set work directory
+WORKDIR /app
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install additional worker dependencies
+RUN pip install celery[redis] redis
+
+# Copy application code
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/temp_processing /app/models /app/celery
+
+# Create non-root user for security
+RUN useradd -m -u 1000 swing_sage && \
+    chown -R swing_sage:swing_sage /app
+USER swing_sage
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD python -c "import redis; redis.Redis.from_url('$REDIS_URL').ping()" || exit 1
+
+# Run worker based on type
+CMD ["python", "-m", "celery", "-A", "worker", "worker", "--loglevel=info", "--concurrency=2"] 

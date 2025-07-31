@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test NUKE 71-75 Features</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #0d1117;
+      color: #f0f6fc;
+    }
+    
+    .test-section {
+      background: #161b22;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid #30363d;
+    }
+    
+    .test-button {
+      background: #00c896;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    
+    .test-button:hover {
+      background: #00a884;
+    }
+    
+    .result {
+      margin-top: 15px;
+      padding: 15px;
+      background: #21262d;
+      border-radius: 8px;
+      border-left: 4px solid #00c896;
+    }
+    
+    /* Import the styles from the main file */
+    /* Real World Labels */
+    .real-world-labels {
+      background: #161b22;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid #30363d;
+    }
+    
+    .swing-assessment-item {
+      margin: 15px 0;
+      padding: 15px;
+      background: #21262d;
+      border-radius: 8px;
+      border-left: 4px solid #00c896;
+    }
+    
+    .assessment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .assessment-label {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #f0f6fc;
+      margin: 8px 0;
+    }
+    
+    .assessment-description {
+      color: #c9d1d9;
+      margin: 8px 0;
+    }
+    
+    .assessment-tooltip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #58a6ff;
+      cursor: pointer;
+      font-size: 0.875rem;
+      margin-top: 10px;
+    }
+    
+    /* Visual Indicators */
+    .visual-indicators {
+      background: #161b22;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid #30363d;
+    }
+    
+    .visual-indicator {
+      background: #21262d;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid #30363d;
+    }
+    
+    .visual-indicator:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.06);
+    }
+    
+    .indicator-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .indicator-hint {
+      font-size: 0.875rem;
+      color: #8b949e;
+      font-style: italic;
+    }
+    
+    /* Pro Comparison */
+    .pro-comparison {
+      background: #161b22;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid #30363d;
+    }
+    
+    .comparison-overlay {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .comparison-frame {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .your-swing, .pro-swing {
+      flex: 1;
+      text-align: center;
+    }
+    
+    .swing-silhouette {
+      width: 120px;
+      height: 200px;
+      margin: 0 auto;
+      position: relative;
+      background: #21262d;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .spine-line {
+      width: 4px;
+      height: 80px;
+      background: #00ff00;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 2px;
+    }
+    
+    .spine-line.broken {
+      background: #ff4444;
+      transform: translateX(-50%) rotate(15deg);
+    }
+    
+    .spine-line.stable {
+      background: #00ff00;
+    }
+    
+    .silhouette-body {
+      width: 60px;
+      height: 120px;
+      background: #8b949e;
+      border-radius: 30px;
+      opacity: 0.3;
+    }
+    
+    .vs-divider {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #8b949e;
+    }
+    
+    .comparison-label {
+      margin-top: 10px;
+      font-size: 0.875rem;
+      color: #c9d1d9;
+    }
+    
+    .comparison-insight {
+      background: #21262d;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #58a6ff;
+    }
+    
+    /* Cause Effect Fix Chain */
+    .cause-effect-fix {
+      background: #161b22;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid #30363d;
+    }
+    
+    .causal-chain {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin: 20px 0;
+      padding: 15px;
+      background: #21262d;
+      border-radius: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .chain-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      flex: 1;
+      min-width: 150px;
+    }
+    
+    .chain-item.fault {
+      background: rgba(248, 81, 73, 0.1);
+      border: 1px solid rgba(248, 81, 73, 0.3);
+    }
+    
+    .chain-item.effect {
+      background: rgba(216, 153, 34, 0.1);
+      border: 1px solid rgba(216, 153, 34, 0.3);
+    }
+    
+    .chain-item.fix {
+      background: rgba(0, 200, 150, 0.1);
+      border: 1px solid rgba(0, 200, 150, 0.3);
+    }
+    
+    .chain-icon {
+      font-size: 1.125rem;
+    }
+    
+    .chain-arrow {
+      font-size: 1.25rem;
+      color: #8b949e;
+      font-weight: 700;
+    }
+    
+    .chain-content h5 {
+      margin: 0;
+      font-size: 0.875rem;
+      color: #f0f6fc;
+    }
+    
+    .no-issues {
+      text-align: center;
+      padding: 20px;
+      color: #00c896;
+    }
+    
+    /* Feels Language */
+    .feels-language {
+      background: #161b22;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid #30363d;
+    }
+    
+    .feels-description {
+      background: #21262d;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+      border-left: 4px solid #d29922;
+    }
+    
+    .feels-description.positive {
+      border-left-color: #00c896;
+    }
+    
+    .feels-context {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 0.875rem;
+      color: #8b949e;
+    }
+    
+    .feels-icon {
+      font-size: 1.125rem;
+    }
+    
+    /* Badge Styles */
+    .badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .badge.green {
+      background: rgba(0, 200, 150, 0.2);
+      color: #00c896;
+      border: 1px solid rgba(0, 200, 150, 0.3);
+    }
+    
+    .badge.yellow {
+      background: rgba(216, 153, 34, 0.2);
+      color: #d29922;
+      border: 1px solid rgba(216, 153, 34, 0.3);
+    }
+    
+    .badge.red {
+      background: rgba(248, 81, 73, 0.2);
+      color: #f85149;
+      border: 1px solid rgba(248, 81, 73, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <h1>Test NUKE 71-75 Features</h1>
+  
+  <div class="test-section">
+    <h2>NUKE 71: Real-World Labels</h2>
+    <button class="test-button" onclick="testRealWorldLabels()">Test Real-World Labels</button>
+    <div id="realWorldLabelsResult" class="result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>NUKE 72: Visual Indicators</h2>
+    <button class="test-button" onclick="testVisualIndicators()">Test Visual Indicators</button>
+    <div id="visualIndicatorsResult" class="result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>NUKE 73: Pro Comparison</h2>
+    <button class="test-button" onclick="testProComparison()">Test Pro Comparison</button>
+    <div id="proComparisonResult" class="result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>NUKE 74: Cause-Effect-Fix Chain</h2>
+    <button class="test-button" onclick="testCauseEffectFix()">Test Cause-Effect-Fix</button>
+    <div id="causeEffectFixResult" class="result"></div>
+  </div>
+  
+  <div class="test-section">
+    <h2>NUKE 75: Feels Language</h2>
+    <button class="test-button" onclick="testFeelsLanguage()">Test Feels Language</button>
+    <div id="feelsLanguageResult" class="result"></div>
+  </div>
+  
+  <script>
+    // Mock metrics for testing
+    const mockMetrics = {
+      spine_drift: {
+        max_drift: 15
+      },
+      elbow_extension: {
+        max_extension: 145
+      },
+      tempo: {
+        ratio: 3.5
+      }
+    };
+    
+    const goodMetrics = {
+      spine_drift: {
+        max_drift: 3
+      },
+      elbow_extension: {
+        max_extension: 165
+      },
+      tempo: {
+        ratio: 2.5
+      }
+    };
+    
+    // NUKE 71: Replace Angle Stats with Real-World Labels
+    function generateRealWorldLabels(metrics) {
+      let html = '<div class="real-world-labels"><h4>🎯 Swing Assessment</h4>';
+      
+      if (metrics.spine_drift) {
+        const drift = metrics.spine_drift.max_drift;
+        let label, description, badge;
+        
+        if (drift <= 5) {
+          label = "Nice posture retention";
+          description = "You maintained excellent spine angle throughout your swing.";
+          badge = '<span class="badge green">✅ Posture Held</span>';
+        } else if (drift <= 12) {
+          label = "Minor posture sway";
+          description = "You had some spine angle changes, but kept it mostly stable.";
+          badge = '<span class="badge yellow">⚠️ Minor Posture Sway</span>';
+        } else {
+          label = "Loss of posture through swing";
+          description = "Your spine angle changed significantly during the swing.";
+          badge = '<span class="badge red">❌ Posture Lost</span>';
+        }
+        
+        html += `
+          <div class="swing-assessment-item">
+            <div class="assessment-header">
+              <h5>Spine Stability</h5>
+              ${badge}
+            </div>
+            <p class="assessment-label">${label}</p>
+            <p class="assessment-description">${description}</p>
+            <div class="assessment-tooltip" onclick="showTooltip('This measures how well you maintain your spine angle throughout the swing. Less change = more consistent ball-striking.', this)">
+              <span class="info-icon">ⓘ</span> What this means
+            </div>
+          </div>
+        `;
+      }
+      
+      if (metrics.elbow_extension) {
+        const extension = metrics.elbow_extension.max_extension;
+        let label, description, badge;
+        
+        if (extension >= 160) {
+          label = "Full backswing width achieved";
+          description = "You're getting excellent extension at the top of your backswing.";
+          badge = '<span class="badge green">✅ Full Extension</span>';
+        } else if (extension >= 150) {
+          label = "Good backswing width";
+          description = "You're getting decent extension, with room for improvement.";
+          badge = '<span class="badge yellow">⚠️ Partial Extension</span>';
+        } else {
+          label = "Limited backswing width";
+          description = "Your trail arm isn't extending fully, which may limit power.";
+          badge = '<span class="badge red">❌ Limited Extension</span>';
+        }
+        
+        html += `
+          <div class="swing-assessment-item">
+            <div class="assessment-header">
+              <h5>Trail Arm Extension</h5>
+              ${badge}
+            </div>
+            <p class="assessment-label">${label}</p>
+            <p class="assessment-description">${description}</p>
+            <div class="assessment-tooltip" onclick="showTooltip('This measures how far your trail arm straightens at the top. More extension = more swing width = more potential power.', this)">
+              <span class="info-icon">ⓘ</span> What this means
+            </div>
+          </div>
+        `;
+      }
+      
+      html += '</div>';
+      return html;
+    }
+    
+    // NUKE 72: Add Simple Visual Indicators
+    function generateVisualIndicators(metrics) {
+      let html = '<div class="visual-indicators"><h4>👁 Visual Feedback</h4>';
+      
+      const indicators = [];
+      
+      if (metrics.spine_drift) {
+        const drift = metrics.spine_drift.max_drift;
+        let color, icon, text;
+        
+        if (drift <= 5) {
+          color = 'green';
+          icon = '✅';
+          text = 'Posture Held';
+        } else if (drift <= 12) {
+          color = 'yellow';
+          icon = '⚠️';
+          text = 'Minor Posture Sway';
+        } else {
+          color = 'red';
+          icon = '❌';
+          text = 'Posture Lost';
+        }
+        
+        indicators.push({
+          metric: 'Spine Stability',
+          badge: `<span class="badge ${color}">${icon} ${text}</span>`,
+          explanation: drift <= 5 ? 
+            "You maintained your posture well through the swing — this helps keep your swing consistent." :
+            drift <= 12 ?
+            "Your spine drifted slightly during the swing — this can affect consistency." :
+            "Your spine drifted significantly during the swing — this often causes toe strikes or topped shots."
+        });
+      }
+      
+      if (metrics.elbow_extension) {
+        const extension = metrics.elbow_extension.max_extension;
+        let color, icon, text;
+        
+        if (extension >= 160) {
+          color = 'green';
+          icon = '✅';
+          text = 'Full Extension';
+        } else if (extension >= 150) {
+          color = 'yellow';
+          icon = '⚠️';
+          text = 'Partial Extension';
+        } else {
+          color = 'red';
+          icon = '❌';
+          text = 'Limited Extension';
+        }
+        
+        indicators.push({
+          metric: 'Trail Arm Extension',
+          badge: `<span class="badge ${color}">${icon} ${text}</span>`,
+          explanation: extension >= 160 ?
+            "You're getting excellent arm extension — this creates good swing width." :
+            extension >= 150 ?
+            "Your arm extension is decent but could be improved for more power." :
+            "Your arm isn't extending fully — this limits your swing width and power potential."
+        });
+      }
+      
+      indicators.forEach(indicator => {
+        html += `
+          <div class="visual-indicator" onclick="showTooltip('${indicator.explanation}', this)">
+            <div class="indicator-header">
+              <h5>${indicator.metric}</h5>
+              ${indicator.badge}
+            </div>
+            <div class="indicator-hint">Tap for explanation</div>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      return html;
+    }
+    
+    // NUKE 73: Show Pro Comparison (Visually, Not Numerically)
+    function generateProComparison(metrics) {
+      let html = '<div class="pro-comparison"><h4>🏆 Pro Comparison</h4>';
+      
+      if (metrics.spine_drift) {
+        const drift = metrics.spine_drift.max_drift;
+        const isPostureBroken = drift > 12;
+        
+        html += `
+          <div class="comparison-overlay">
+            <div class="comparison-frame">
+              <div class="your-swing">
+                <h5>Your Swing at Top</h5>
+                <div class="swing-silhouette ${isPostureBroken ? 'posture-broken' : 'posture-good'}">
+                  <div class="spine-line ${isPostureBroken ? 'broken' : 'stable'}"></div>
+                  <div class="silhouette-body"></div>
+                </div>
+                <p class="comparison-label">${isPostureBroken ? 'Spine angle changed' : 'Good posture maintained'}</p>
+              </div>
+              <div class="vs-divider">vs</div>
+              <div class="pro-swing">
+                <h5>Pro's Swing at Top</h5>
+                <div class="swing-silhouette pro-reference">
+                  <div class="spine-line stable"></div>
+                  <div class="silhouette-body"></div>
+                </div>
+                <p class="comparison-label">Consistent spine angle</p>
+              </div>
+            </div>
+            <div class="comparison-insight">
+              <p>${isPostureBroken ? 
+                'See how your upper body lifted compared to the pro? That\'s what we mean by "standing up out of the shot."' :
+                'Your posture maintenance looks good compared to elite standards!'}</p>
+            </div>
+          </div>
+        `;
+      }
+      
+      html += '</div>';
+      return html;
+    }
+    
+    // NUKE 74: Add Cause → Effect → Fix Chain
+    function generateCauseEffectFixChain(metrics) {
+      let html = '<div class="cause-effect-fix"><h4>💡 Understanding Your Swing</h4>';
+      
+      const chains = [];
+      
+      if (metrics.spine_drift && metrics.spine_drift.max_drift > 12) {
+        chains.push({
+          fault: "Posture Drift",
+          effect: "This often leads to thin shots or inconsistent ball flight",
+          fix: "Try the 'Wall Drill' to train stability through transition"
+        });
+      }
+      
+      if (metrics.elbow_extension && metrics.elbow_extension.max_extension < 150) {
+        chains.push({
+          fault: "Limited Trail Arm Extension",
+          effect: "This reduces swing width and can limit power generation",
+          fix: "Practice the 'Towel Under Arm' drill to encourage full extension"
+        });
+      }
+      
+      if (metrics.tempo && metrics.tempo.ratio > 3.0) {
+        chains.push({
+          fault: "Rushed Downswing",
+          effect: "This can cause timing issues and inconsistent contact",
+          fix: "Try the '1-2-3 Count' drill to establish better tempo"
+        });
+      }
+      
+      chains.forEach(chain => {
+        html += `
+          <div class="causal-chain">
+            <div class="chain-item fault">
+              <span class="chain-icon">🛠</span>
+              <div class="chain-content">
+                <h5>Fault: ${chain.fault}</h5>
+              </div>
+            </div>
+            <div class="chain-arrow">→</div>
+            <div class="chain-item effect">
+              <span class="chain-icon">🎯</span>
+              <div class="chain-content">
+                <h5>Effect: ${chain.effect}</h5>
+              </div>
+            </div>
+            <div class="chain-arrow">→</div>
+            <div class="chain-item fix">
+              <span class="chain-icon">💡</span>
+              <div class="chain-content">
+                <h5>Fix: ${chain.fix}</h5>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      if (chains.length === 0) {
+        html += `
+          <div class="no-issues">
+            <p>🎉 Great news! No major swing faults detected. Keep practicing to maintain this good form.</p>
+          </div>
+        `;
+      }
+      
+      html += '</div>';
+      return html;
+    }
+    
+    // NUKE 75: Swap "Degrees" with "Feels" Language
+    function generateFeelsLanguage(metrics) {
+      let html = '<div class="feels-language"><h4>❤️ How It Feels</h4>';
+      
+      if (metrics.spine_drift && metrics.spine_drift.max_drift > 12) {
+        const drift = metrics.spine_drift.max_drift;
+        html += `
+          <div class="feels-description">
+            <p>You straightened up halfway through your downswing. That often feels like you're 'standing up out of the shot' — and can cause tops or blocks.</p>
+            <div class="feels-context">
+              <span class="feels-icon">💭</span>
+              <span class="feels-text">This is a common feeling when your spine angle changes during the swing</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      if (metrics.elbow_extension && metrics.elbow_extension.max_extension < 150) {
+        const extension = metrics.elbow_extension.max_extension;
+        const shortfall = 160 - extension;
+        html += `
+          <div class="feels-description">
+            <p>Your trail arm didn't extend fully at the top. This often feels like you're 'crowding the ball' or 'not getting enough width' — and can limit your power potential.</p>
+            <div class="feels-context">
+              <span class="feels-icon">💭</span>
+              <span class="feels-text">Many golfers feel this when they don't create enough backswing width</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      if (metrics.tempo && metrics.tempo.ratio > 3.0) {
+        html += `
+          <div class="feels-description">
+            <p>Your downswing felt rushed compared to your backswing. This often feels like you're 'jumping at the ball' — and can lead to timing issues and inconsistent contact.</p>
+            <div class="feels-context">
+              <span class="feels-icon">💭</span>
+              <span class="feels-text">This is a common feeling when tempo gets out of sync</span>
+            </div>
+          </div>
+        `;
+      }
+      
+      if (!metrics.spine_drift || metrics.spine_drift.max_drift <= 12) {
+        if (!metrics.elbow_extension || metrics.elbow_extension.max_extension >= 150) {
+          if (!metrics.tempo || metrics.tempo.ratio <= 3.0) {
+            html += `
+              <div class="feels-description positive">
+                <p>Your swing felt smooth and controlled. You maintained good posture and got decent extension — this is the feeling of a well-executed swing!</p>
+                <div class="feels-context">
+                  <span class="feels-icon">🎯</span>
+                  <span class="feels-text">This is the feeling you want to replicate</span>
+                </div>
+              </div>
+            `;
+          }
+        }
+      }
+      
+      html += '</div>';
+      return html;
+    }
+    
+    function showTooltip(text, element) {
+      alert(text);
+    }
+    
+    // Test functions
+    function testRealWorldLabels() {
+      document.getElementById('realWorldLabelsResult').innerHTML = generateRealWorldLabels(mockMetrics);
+    }
+    
+    function testVisualIndicators() {
+      document.getElementById('visualIndicatorsResult').innerHTML = generateVisualIndicators(mockMetrics);
+    }
+    
+    function testProComparison() {
+      document.getElementById('proComparisonResult').innerHTML = generateProComparison(mockMetrics);
+    }
+    
+    function testCauseEffectFix() {
+      document.getElementById('causeEffectFixResult').innerHTML = generateCauseEffectFixChain(mockMetrics);
+    }
+    
+    function testFeelsLanguage() {
+      document.getElementById('feelsLanguageResult').innerHTML = generateFeelsLanguage(mockMetrics);
+    }
+  </script>
+</body>
+</html> 

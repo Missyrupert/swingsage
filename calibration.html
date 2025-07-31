@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Calibration - Swing Sage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .silhouette {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            border-radius: 60px;
+            backdrop-filter: blur(2px);
+        }
+
+        .silhouette::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 40px;
+        }
+
+        .silhouette::after {
+            content: '';
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 30px;
+        }
+
+        .instructions {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            max-width: 90%;
+            z-index: 3;
+        }
+
+        .instructions h1 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .instructions p {
+            font-size: 1em;
+            line-height: 1.4;
+            color: #ccc;
+        }
+
+        .status {
+            position: absolute;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 30px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            z-index: 3;
+            transition: all 0.3s ease;
+        }
+
+        .status.ready {
+            background: rgba(0, 255, 0, 0.3);
+            border: 2px solid rgba(0, 255, 0, 0.8);
+        }
+
+        .status.not-ready {
+            background: rgba(255, 165, 0, 0.3);
+            border: 2px solid rgba(255, 165, 0, 0.8);
+        }
+
+        .proceed-btn {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 3;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .proceed-btn.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .proceed-btn:hover {
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            z-index: 3;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .alignment-guides {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .guide-line {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 2px;
+        }
+
+        .guide-line.vertical {
+            width: 2px;
+            height: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .guide-line.horizontal {
+            height: 2px;
+            width: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 4;
+        }
+
+        .loading h2 {
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(255, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            z-index: 4;
+        }
+
+        .error h2 {
+            margin-bottom: 15px;
+        }
+
+        .error button {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .silhouette {
+                width: 100px;
+                height: 250px;
+                border-radius: 50px;
+            }
+
+            .silhouette::before {
+                width: 70px;
+                height: 80px;
+                border-radius: 35px;
+            }
+
+            .silhouette::after {
+                width: 50px;
+                height: 60px;
+                border-radius: 25px;
+            }
+
+            .instructions h1 {
+                font-size: 1.3em;
+            }
+
+            .instructions p {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <video id="video" autoplay muted playsinline></video>
+        
+        <div class="overlay">
+            <div class="alignment-guides">
+                <div class="guide-line vertical"></div>
+                <div class="guide-line horizontal"></div>
+            </div>
+            
+            <div class="silhouette" id="silhouette"></div>
+            
+            <div class="instructions">
+                <h1>📹 Camera Setup</h1>
+                <p>Position yourself to match the outline. Stand about 6-8 feet from the camera, side-on to your target.</p>
+            </div>
+            
+            <div class="status not-ready" id="status">
+                <span id="statusText">Aligning...</span>
+            </div>
+            
+            <button class="proceed-btn" id="proceedBtn" onclick="proceedToRecording()">
+                🎬 Start Recording
+            </button>
+        </div>
+        
+        <button class="back-btn" onclick="goBack()">← Back</button>
+        
+        <div class="loading" id="loading">
+            <h2>Setting up camera...</h2>
+            <div class="spinner"></div>
+        </div>
+        
+        <div class="error" id="error" style="display: none;">
+            <h2>Camera Access Required</h2>
+            <p>Please allow camera access to use the calibration tool.</p>
+            <button onclick="startCamera()">Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        let stream = null;
+        let isAligned = false;
+        let alignmentCheckInterval = null;
+
+        // DOM elements
+        const video = document.getElementById('video');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const status = document.getElementById('status');
+        const statusText = document.getElementById('statusText');
+        const proceedBtn = document.getElementById('proceedBtn');
+        const silhouette = document.getElementById('silhouette');
+
+        // Start camera on page load
+        window.addEventListener('load', startCamera);
+
+        async function startCamera() {
+            try {
+                loading.style.display = 'block';
+                error.style.display = 'none';
+
+                // Request camera access
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment', // Use back camera on mobile
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    }
+                });
+
+                video.srcObject = stream;
+                
+                // Wait for video to load
+                video.addEventListener('loadedmetadata', () => {
+                    loading.style.display = 'none';
+                    startAlignmentCheck();
+                });
+
+            } catch (err) {
+                console.error('Camera access error:', err);
+                loading.style.display = 'none';
+                error.style.display = 'block';
+            }
+        }
+
+        function startAlignmentCheck() {
+            // Start checking alignment every 500ms
+            alignmentCheckInterval = setInterval(checkAlignment, 500);
+        }
+
+        function checkAlignment() {
+            // Simulate alignment detection
+            // In a real implementation, you would use computer vision to detect
+            // if the person matches the silhouette position
+            
+            // For demo purposes, we'll use a simple timer-based approach
+            const timeSinceStart = Date.now() - window.startTime;
+            const alignmentThreshold = 3000; // 3 seconds
+            
+            if (timeSinceStart > alignmentThreshold) {
+                setAligned(true);
+            } else {
+                setAligned(false);
+            }
+        }
+
+        function setAligned(aligned) {
+            if (aligned === isAligned) return;
+            
+            isAligned = aligned;
+            
+            if (aligned) {
+                status.className = 'status ready';
+                statusText.textContent = '✅ Positioned correctly!';
+                proceedBtn.classList.add('visible');
+                silhouette.style.borderColor = 'rgba(0, 255, 0, 0.8)';
+                silhouette.style.background = 'rgba(0, 255, 0, 0.2)';
+            } else {
+                status.className = 'status not-ready';
+                statusText.textContent = '⏳ Aligning...';
+                proceedBtn.classList.remove('visible');
+                silhouette.style.borderColor = 'rgba(255, 255, 255, 0.8)';
+                silhouette.style.background = 'rgba(255, 255, 255, 0.3)';
+            }
+        }
+
+        function proceedToRecording() {
+            if (!isAligned) return;
+            
+            // Stop the camera stream
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            
+            // Clear the alignment check interval
+            if (alignmentCheckInterval) {
+                clearInterval(alignmentCheckInterval);
+            }
+            
+            // In a real app, you would navigate to the recording page
+            // For now, we'll show a success message
+            alert('Camera calibrated! Ready to record your swing.');
+            
+            // You can redirect to your main app here:
+            // window.location.href = '/record';
+        }
+
+        function goBack() {
+            // Stop the camera stream
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            
+            // Clear the alignment check interval
+            if (alignmentCheckInterval) {
+                clearInterval(alignmentCheckInterval);
+            }
+            
+            // Go back to previous page
+            window.history.back();
+        }
+
+        // Initialize start time for demo alignment
+        window.startTime = Date.now();
+
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Pause alignment check when page is not visible
+                if (alignmentCheckInterval) {
+                    clearInterval(alignmentCheckInterval);
+                }
+            } else {
+                // Resume alignment check when page becomes visible
+                if (video.srcObject) {
+                    startAlignmentCheck();
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            // Adjust silhouette position if needed
+            const videoAspectRatio = video.videoWidth / video.videoHeight;
+            const windowAspectRatio = window.innerWidth / window.innerHeight;
+            
+            if (videoAspectRatio !== windowAspectRatio) {
+                // Adjust silhouette size or position based on video dimensions
+                console.log('Video aspect ratio:', videoAspectRatio);
+            }
+        });
+    </script>
+</body>
+</html> 
